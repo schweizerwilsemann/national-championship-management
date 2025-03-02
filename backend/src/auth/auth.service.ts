@@ -17,7 +17,7 @@ export class AuthService {
   async register(
     registerDto: RegisterDto,
   ): Promise<{ user?: User; message: string; statusCode: number }> {
-    const { email, password, name, role } = registerDto;
+    const { email, password, name, role = 'USER' } = registerDto; // Gán mặc định là 'USER'
 
     // Check if the email already exists
     const existingUser = await this.prisma.user.findUnique({
@@ -41,7 +41,6 @@ export class AuthService {
     } catch (error) {
       console.error('Register Error:', error);
 
-      // Kiểm tra lỗi UNIQUE constraint của Prisma
       if (error.code === 'P2002') {
         return { message: 'Email already in use', statusCode: 409 };
       }
@@ -59,14 +58,16 @@ export class AuthService {
     });
 
     if (!user) {
-      response.status(401).json({ message: 'User not found' });
+      response.status(401).json({ statusCode: 401, message: 'User not found' });
       return; // Ensure to return after sending response
     }
 
     // Compare password
     const isPasswordValid = await bcrypt.compare(password, user?.password);
     if (!isPasswordValid) {
-      response.status(401).json({ message: 'Invalid password' });
+      response
+        .status(401)
+        .json({ statusCode: 401, message: 'Invalid password' });
       return; // Ensure to return after sending response
     }
 
@@ -84,6 +85,10 @@ export class AuthService {
       maxAge: 86400000, // 1 day
     });
 
-    response.json({ accessToken });
+    response.json({
+      statusCode: 200,
+      accessToken,
+      user: { id: user.id, email: user.email, role: user.role },
+    });
   }
 }

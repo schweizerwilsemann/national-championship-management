@@ -1,8 +1,9 @@
-import { Controller, Post, Body, Res } from '@nestjs/common';
+import { Controller, Post, Get, Body, Res, Req } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dtos/login.dto';
 import { Response } from 'express';
 import { RegisterDto } from './dtos/register.dto';
+import { Request } from 'express';
 
 @Controller('auth')
 export class AuthController {
@@ -22,5 +23,9 @@ export class AuthController {
   async logout(@Res() response: Response) {
     response.clearCookie('access_token');
     response.json('Logout successfully');
+  }
+  @Get('check-cookie')
+  checkCookie(@Req() req: Request) {
+    return req.cookies?.access_token || 'No cookie found';
   }
 }

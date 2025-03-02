@@ -1,9 +1,6 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,8 +8,6 @@ generator client {
 datasource db {
   provider  = "postgresql"
   url  	    = env("DATABASE_URL")
-  // uncomment next line if you use Prisma <5.10
-  // directUrl = env("DATABASE_URL_UNPOOLED")
 }
 
 // Người dùng hệ thống
@@ -31,7 +26,6 @@ model User {
 enum UserRole {
   ADMIN
   ORGANIZER
-  TEAM_MANAGER
   REFEREE
   USER
 }
@@ -39,23 +33,19 @@ enum UserRole {
 // Giải đấu
 model Tournament {
   id              String    @id @default(uuid())
-  name            String
+  name            String    @unique
   year            Int
   description     String?   @db.Text
   startDate       DateTime
   endDate         DateTime
-  teamsCount      Int
   status          TournamentStatus @default(PREPARING)
   logo            String?
-  rules           String?   @db.Text
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
   
   // Quan hệ
   teams           Team[]
   matches         Match[]
-  referees        TournamentReferee[]
-  seasons         Season[]
   
   @@map("tournaments")
 }
@@ -67,70 +57,26 @@ enum TournamentStatus {
   CANCELLED
 }
 
-// Mùa giải
-model Season {
-  id              String    @id @default(uuid())
-  name            String
-  startDate       DateTime
-  endDate         DateTime
-  isActive        Boolean   @default(false)
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-  
-  // Quan hệ
-  tournamentId    String
-  tournament      Tournament @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
-  
-  @@map("seasons")
-}
-
 // Đội bóng
 model Team {
   id              String    @id @default(uuid())
   name            String
   shortName       String?   @db.VarChar(10)  // Tên viết tắt
   logo            String?
-  founded         Int?      // Năm thành lập
   homeColor       String?   // Màu áo sân nhà
-  awayColor       String?   // Màu áo sân khách
-  website         String?
-  description     String?   @db.Text
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
   
   // Quan hệ
-  stadiumId       String?
-  stadium         Stadium?   @relation(fields: [stadiumId], references: [id])
   tournamentId    String
   tournament      Tournament @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
   players         Player[]
-  staff           Staff[]
   homeMatches     Match[]   @relation("HomeTeam")
   awayMatches     Match[]   @relation("AwayTeam")
   standings       Standing[]
   
   @@unique([name, tournamentId])
   @@map("teams")
-}
-
-// Sân vận động
-model Stadium {
-  id              String    @id @default(uuid())
-  name            String
-  city            String
-  capacity        Int
-  surface         String?   // Loại mặt sân
-  image           String?
-  address         String?
-  yearBuilt       Int?
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-  
-  // Quan hệ
-  teams           Team[]
-  matches         Match[]
-  
-  @@map("stadiums")
 }
 
 // Cầu thủ
@@ -141,10 +87,7 @@ model Player {
   position        PlayerPosition
   birthDate       DateTime
   nationality     String
-  height          Float?    // Chiều cao (cm)
-  weight          Float?    // Cân nặng (kg)
   image           String?
-  biography       String?   @db.Text
   isActive        Boolean   @default(true)
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
@@ -153,8 +96,6 @@ model Player {
   teamId          String
   team            Team      @relation(fields: [teamId], references: [id], onDelete: Cascade)
   goals           Goal[]
-  cards           Card[]
-  playerMatches   PlayerMatch[]
   
   @@map("players")
 }
@@ -166,77 +107,6 @@ enum PlayerPosition {
   FORWARD         // Tiền đạo
 }
 
-// Nhân viên đội bóng (HLV, trợ lý, bác sĩ...)
-model Staff {
-  id              String    @id @default(uuid())
-  name            String
-  role            StaffRole
-  birthDate       DateTime?
-  nationality     String
-  image           String?
-  biography       String?   @db.Text
-  isActive        Boolean   @default(true)
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-  
-  // Quan hệ
-  teamId          String
-  team            Team      @relation(fields: [teamId], references: [id], onDelete: Cascade)
-  
-  @@map("staff")
-}
-
-enum StaffRole {
-  HEAD_COACH      // Huấn luyện viên trưởng
-  ASSISTANT_COACH // Trợ lý HLV
-  GOALKEEPER_COACH // HLV thủ môn
-  PHYSICAL_COACH  // HLV thể lực
-  DOCTOR          // Bác sĩ
-  PHYSIOTHERAPIST // Chuyên viên vật lý trị liệu
-  TEAM_MANAGER    // Quản lý đội
-  ANALYST         // Phân tích viên
-}
-
-// Trọng tài
-model Referee {
-  id              String    @id @default(uuid())
-  name            String
-  nationality     String
-  birthDate       DateTime
-  image           String?
-  since           Int?      // Năm bắt đầu làm trọng tài
-  type            RefereeType
-  isActive        Boolean   @default(true)
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-  
-  // Quan hệ
-  tournamentReferees TournamentReferee[]
-  matches         MatchReferee[]
-  
-  @@map("referees")
-}
-
-enum RefereeType {
-  MAIN            // Trọng tài chính
-  ASSISTANT       // Trọng tài biên
-  FOURTH          // Trọng tài thứ 4
-  VAR             // Trọng tài VAR
-}
-
-// Quan hệ nhiều-nhiều giữa Giải đấu và Trọng tài
-model TournamentReferee {
-  id              String    @id @default(uuid())
-  tournamentId    String
-  tournament      Tournament @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
-  refereeId       String
-  referee         Referee   @relation(fields: [refereeId], references: [id], onDelete: Cascade)
-  createdAt       DateTime  @default(now())
-  
-  @@unique([tournamentId, refereeId])
-  @@map("tournament_referees")
-}
-
 // Trận đấu
 model Match {
   id              String    @id @default(uuid())
@@ -246,9 +116,6 @@ model Match {
   status          MatchStatus @default(SCHEDULED)
   homeScore       Int?      // Bàn thắng đội nhà
   awayScore       Int?      // Bàn thắng đội khách
-  homeHalfScore   Int?      // Bàn thắng đội nhà hiệp 1
-  awayHalfScore   Int?      // Bàn thắng đội khách hiệp 1
-  attendance      Int?      // Số lượng khán giả
   highlights      String?   // Link video tóm tắt trận đấu
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
@@ -260,12 +127,7 @@ model Match {
   homeTeam        Team      @relation("HomeTeam", fields: [homeTeamId], references: [id])
   awayTeamId      String
   awayTeam        Team      @relation("AwayTeam", fields: [awayTeamId], references: [id])
-  stadiumId       String
-  stadium         Stadium   @relation(fields: [stadiumId], references: [id])
-  referees        MatchReferee[]
   goals           Goal[]
-  cards           Card[]
-  playerMatches   PlayerMatch[]
   
   @@map("matches")
 }
@@ -278,20 +140,6 @@ enum MatchStatus {
   CANCELLED       // Hủy bỏ
 }
 
-// Quan hệ nhiều-nhiều giữa Trận đấu và Trọng tài
-model MatchReferee {
-  id              String    @id @default(uuid())
-  matchId         String
-  match           Match     @relation(fields: [matchId], references: [id], onDelete: Cascade)
-  refereeId       String
-  referee         Referee   @relation(fields: [refereeId], references: [id])
-  role            RefereeType // Vai trò trong trận đấu
-  createdAt       DateTime  @default(now())
-  
-  @@unique([matchId, refereeId])
-  @@map("match_referees")
-}
-
 // Bàn thắng
 model Goal {
   id              String    @id @default(uuid())
@@ -299,7 +147,6 @@ model Goal {
   type            GoalType  @default(NORMAL)
   isOwnGoal       Boolean   @default(false)
   isPenalty       Boolean   @default(false)
-  description     String?
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
   
@@ -308,7 +155,6 @@ model Goal {
   match           Match     @relation(fields: [matchId], references: [id], onDelete: Cascade)
   scorerId        String
   scorer          Player    @relation(fields: [scorerId], references: [id])
-  assistId        String?   // ID cầu thủ kiến tạo
   
   @@map("goals")
 }
@@ -319,50 +165,6 @@ enum GoalType {
   PENALTY         // Phạt đền
   FREE_KICK       // Đá phạt
   HEADER          // Đánh đầu
-}
-
-// Thẻ phạt
-model Card {
-  id              String    @id @default(uuid())
-  type            CardType
-  minute          Int       // Phút nhận thẻ
-  reason          String?
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-  
-  // Quan hệ
-  matchId         String
-  match           Match     @relation(fields: [matchId], references: [id], onDelete: Cascade)
-  playerId        String
-  player          Player    @relation(fields: [playerId], references: [id])
-  
-  @@map("cards")
-}
-
-enum CardType {
-  YELLOW
-  RED
-  SECOND_YELLOW
-}
-
-// Tham gia trận đấu (cầu thủ tham gia trận đấu)
-model PlayerMatch {
-  id              String    @id @default(uuid())
-  isStarter       Boolean   @default(false) // Đá chính hay dự bị
-  minutesPlayed   Int?      // Số phút thi đấu
-  rating          Float?    // Đánh giá (thang điểm 10)
-  inMinute        Int?      // Phút vào sân (đối với cầu thủ dự bị)
-  outMinute       Int?      // Phút rời sân (nếu bị thay ra)
-  createdAt       DateTime  @default(now())
-  
-  // Quan hệ
-  matchId         String
-  match           Match     @relation(fields: [matchId], references: [id], onDelete: Cascade)
-  playerId        String
-  player          Player    @relation(fields: [playerId], references: [id])
-  
-  @@unique([matchId, playerId])
-  @@map("player_matches")
 }
 
 // Bảng xếp hạng
