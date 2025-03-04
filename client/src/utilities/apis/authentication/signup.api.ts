@@ -1,4 +1,4 @@
-import axios from "axios";
+
 import instance from "@/utilities/customize/axios.customize";
 
 const url = `/auth/register`;

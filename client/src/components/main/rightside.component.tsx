@@ -2,8 +2,8 @@
 import React, { useEffect, useState } from 'react'
 import MenuToggle from './menu.toggle.component'
 import Link from 'next/link'
-import { checkCookie } from '@/utilities/apis/checkcookie.api'
-import { signOut } from '@/utilities/apis/signout.api'
+import { checkCookie } from '@/utilities/apis/authentication/checkcookie.api'
+import { signOut } from '@/utilities/apis/authentication/signout.api'
 
 const RightSideComponent = () => {
     const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);

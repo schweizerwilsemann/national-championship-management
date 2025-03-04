@@ -133,7 +133,7 @@ export const subNavItems = [
   "Home",
   "Fixtures",
   "Results",
-  "Tables",
+  "Standings",
   "Transfers",
   "Injury news",
   "Stats",

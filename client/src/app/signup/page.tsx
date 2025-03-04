@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import PremierLeagueLayout from '@/app/PremierLeagueLayout';
 import Link from 'next/link';
-import { signup } from '@/utilities/apis/signup.api'; // Import the signup function
+import { signup } from '@/utilities/apis/authentication/signup.api'; // Import the signup function
 import { message } from 'antd'; // Import Ant Design message
 import { useRouter } from 'next/navigation'; // Change import to useRouter from next/navigation
 

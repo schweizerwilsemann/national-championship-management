@@ -6,7 +6,7 @@ import { ConfigProvider, App } from "antd";
 
 
 export default function RootLayout({
-  children,
+  children
 }: Readonly<{
   children: React.ReactNode;
 }>) {
