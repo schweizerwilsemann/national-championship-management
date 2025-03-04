@@ -1,4 +1,4 @@
-import { Injectable, Res, UnauthorizedException } from '@nestjs/common';
+import { Injectable, Res } from '@nestjs/common';
 import { PrismaService } from '@/prisma/prisma.service'; // Adjust the import path as necessary
 import { RegisterDto } from './dtos/register.dto';
 import { LoginDto } from './dtos/login.dto';
