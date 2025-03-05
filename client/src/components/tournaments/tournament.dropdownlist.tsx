@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import { getAllTournaments } from "@/utilities/apis/tournaments/get.tournament.api";
-import PremierLeagueTable from "../standings/table.component";
+import PremierLeagueTable from "@/components/standings/table.component";
+import ResultsComponent from "@/components/results/results.components";
 
 interface Tournament {
     id: string;

@@ -10,7 +10,7 @@ export class StandingService {
   async getCurrentStanding(tournamentId: string): Promise<Standing[]> {
     return this.prisma.standing.findMany({
       where: { tournamentId },
-      orderBy: { position: 'asc' },
+      orderBy: { points: 'desc' },
       include: { team: { select: { name: true } } }, // Joining table to display name
     });
   }

@@ -48,22 +48,7 @@ const PremierLeagueTable = (props: IProps) => {
     return (
         <div className="container mx-auto p-4 bg-gray-100">
             <h1 className="text-2xl font-bold text-blue-500 text-center mb-4">Tables</h1>
-            {/* Filters Section */}
-            <div className="flex flex-col md:flex-row gap-4 mb-4 justify-center items-center">
-                <select className="p-2 border border-gray-300 rounded">
-                    <option value="premier-league">Premier League</option>
-                </select>
-                <select className="p-2 border border-gray-300 rounded">
-                    <option value="2024/25">2024/25</option>
-                </select>
-                <select className="p-2 border border-gray-300 rounded">
-                    <option value="all">All Matchweeks</option>
-                </select>
-                <select className="p-2 border border-gray-300 rounded">
-                    <option value="all">All Matches</option>
-                </select>
-                <button className="p-2 bg-white border border-gray-300 rounded hover:bg-gray-100">RESET FILTERS</button>
-            </div>
+
             {/* Table */}
             <div className="overflow-x-auto">
                 <table className="w-full border-collapse bg-white shadow-md">
@@ -80,15 +65,14 @@ const PremierLeagueTable = (props: IProps) => {
                             <th className="p-3 text-left font-semibold">GD</th>
                             <th className="p-3 text-left font-semibold">Points</th>
                             <th className="p-3 text-left font-semibold">Form</th>
-                            <th className="p-3 text-left font-semibold">Next</th>
                             <th className="p-3 text-left font-semibold">More</th>
                         </tr>
                     </thead>
                     <tbody>
                         {tableData.length > 0 ? (
-                            tableData.map((team) => (
-                                <tr key={team.position} className="border-b border-gray-200 hover:bg-gray-50">
-                                    <td className="p-3">{team.position}.</td>
+                            tableData.map((team, index) => (
+                                <tr key={team.id} className="border-b border-gray-200 hover:bg-gray-50">
+                                    <td className="p-3">{index + 1}.</td>
                                     <td className="p-3">{team.team.name}</td>
                                     <td className="p-3">{team.played}</td>
                                     <td className="p-3">{team.won}</td>
@@ -114,7 +98,6 @@ const PremierLeagueTable = (props: IProps) => {
                                             ))}
                                         </div>
                                     </td>
-                                    <td className="p-3">▼</td>
                                     <td className="p-3">▼</td>
                                 </tr>
                             ))

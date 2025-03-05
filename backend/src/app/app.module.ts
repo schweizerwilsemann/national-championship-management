@@ -6,6 +6,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { AuthModule } from '@/auth/auth.module';
 import { StandingModule } from '@/standing/standing.module';
 import { TournamentModule } from '@/tournament/tournament.module';
+import { MatchModule } from '@/match/match.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { TournamentModule } from '@/tournament/tournament.module';
     ConfigModule.forRoot({ isGlobal: true }),
     StandingModule,
     TournamentModule,
+    MatchModule,
   ],
   controllers: [AppController],
   providers: [AppService],
