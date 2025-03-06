@@ -11,7 +11,7 @@ export class StandingService {
     return this.prisma.standing.findMany({
       where: { tournamentId },
       orderBy: { points: 'desc' },
-      include: { team: { select: { name: true } } }, // Joining table to display name
+      include: { team: { select: { name: true, logo: true } } }, // Joining table to display name
     });
   }
 }

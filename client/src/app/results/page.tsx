@@ -1,8 +1,10 @@
+
+import ResultsComponent from '@/components/results/results.components'
 import React from 'react'
 
 const ResultsPage = () => {
     return (
-        <div>ResultsPage</div>
+        <ResultsComponent />
     )
 }
 

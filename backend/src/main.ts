@@ -9,7 +9,7 @@ async function bootstrap() {
   app.use(cookieParser());
   app.setGlobalPrefix(process.env.GLOBAL_PREFIX || '');
   app.enableCors({
-    origin: [process.env.CLIENT_URL, process.env.PRODUCTION_DOMAIN_NAME], // Default to localhost if env var not set
+    origin: [process.env.CLIENT_URL, process.env.PRODUCTION_DOMAIN_NAME],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
     allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
@@ -17,6 +17,9 @@ async function bootstrap() {
     optionsSuccessStatus: 204,
   });
 
-  await app.listen(process.env.PORT ?? 8081);
+  const port = process.env.PORT ?? 8081;
+  await app.listen(port);
+  console.log(`🚀 Server running on http://localhost:${port}`);
 }
+
 bootstrap();

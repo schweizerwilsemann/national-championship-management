@@ -5,7 +5,6 @@ import TournamentDropdown from '@/components/tournaments/tournament.dropdownlist
 const ResultsLayout = ({ children }: { children: React.ReactNode }) => {
     return (
         <PremierLeagueLayout>
-            <TournamentDropdown />
             {/* Filters Section */}
             <div className="flex flex-col md:flex-row gap-4 mb-4 justify-center items-center">
                 <select className="p-2 border border-gray-300 rounded">

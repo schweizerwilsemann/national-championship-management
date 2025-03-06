@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { getAllTournaments } from "@/utilities/apis/tournaments/get.tournament.api";
 import PremierLeagueTable from "@/components/standings/table.component";
 import ResultsComponent from "@/components/results/results.components";
+import { useOngoingTour } from '@/context/ongoing.tour.context';
 
 interface Tournament {
     id: string;
@@ -21,12 +22,12 @@ const TournamentDropdown = () => {
     const [selectedTournament, setSelectedTournament] = useState<Tournament | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
+    const { ongoingTournament, loading: loadingOngoing, error: errorOngoing } = useOngoingTour();
 
     useEffect(() => {
         const fetchTournaments = async () => {
             try {
                 const response = await getAllTournaments();
-                console.log(">>> check res: ", response);
                 if (response.length === 0) throw new Error("Failed to fetch tournaments");
                 const data: Tournament[] = response;
                 setTournaments(data);
@@ -77,7 +78,15 @@ const TournamentDropdown = () => {
                     </div>
                 )}
             </div>
-            {selectedTournament && <PremierLeagueTable id={selectedTournament.id} />}
+            {selectedTournament ? (
+                <PremierLeagueTable id={selectedTournament.id} />
+            ) : ongoingTournament ? (
+                <PremierLeagueTable id={ongoingTournament.id} />
+            ) : loadingOngoing ? (
+                <p>Loading ongoing tournament...</p>
+            ) : errorOngoing ? (
+                <p className="text-red-500">{errorOngoing}</p>
+            ) : null}
         </>
     );
 };

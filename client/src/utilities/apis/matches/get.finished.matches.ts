@@ -1,11 +1,17 @@
 import instance from "@/utilities/customize/axios.customize";
 
-// Replace 'yourTournamentId' with the actual tournament ID
-
-export const getFinishedMatches = async (id: string) => {
-  const url = `/standings/${id}`;
+export const getFinishedMatches = async (
+  id: string,
+  params?: { page?: number; limit?: number }
+) => {
+  const url = `/matches/${id}/finished`;
   try {
-    const response = await instance.get(url);
+    const response = await instance.get(url, {
+      params: {
+        page: params?.page || 1,
+        limit: params?.limit || 10,
+      },
+    });
     return response;
   } catch (error) {
     console.error("Error fetching standings:", error);

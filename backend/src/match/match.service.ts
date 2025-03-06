@@ -21,8 +21,8 @@ export class MatchService {
       },
       orderBy: { date: 'desc' },
       include: {
-        homeTeam: { select: { name: true } },
-        awayTeam: { select: { name: true } },
+        homeTeam: { select: { name: true, logo: true } },
+        awayTeam: { select: { name: true, logo: true } },
       },
       skip,
       take: Number(limit),
