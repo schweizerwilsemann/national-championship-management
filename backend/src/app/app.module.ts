@@ -8,6 +8,7 @@ import { StandingModule } from '@/standing/standing.module';
 import { TournamentModule } from '@/tournament/tournament.module';
 import { MatchModule } from '@/match/match.module';
 import { PlayerModule } from '@/player/player.module';
+import { TeamModule } from '@/team/team.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { PlayerModule } from '@/player/player.module';
     TournamentModule,
     MatchModule,
     PlayerModule,
+    TeamModule,
   ],
   controllers: [AppController],
   providers: [AppService],
