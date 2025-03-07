@@ -7,6 +7,7 @@ import { AuthModule } from '@/auth/auth.module';
 import { StandingModule } from '@/standing/standing.module';
 import { TournamentModule } from '@/tournament/tournament.module';
 import { MatchModule } from '@/match/match.module';
+import { PlayerModule } from '@/player/player.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { MatchModule } from '@/match/match.module';
     StandingModule,
     TournamentModule,
     MatchModule,
+    PlayerModule,
   ],
   controllers: [AppController],
   providers: [AppService],
