@@ -26,29 +26,36 @@ export class PlayerService {
   ): Promise<Player[]> {
     const filters: Prisma.PlayerWhereInput = {};
 
-    if (name) {
+    if (name?.trim()) {
+      // Kiểm tra name không rỗng
       filters.name = {
-        contains: name, // Changed from equals to contains for partial matching
+        contains: name.trim(),
         mode: 'insensitive',
       };
     }
+
     if (teamId) {
       filters.teamId = teamId;
     }
-    if (nationality) {
+
+    if (nationality?.trim()) {
+      // Kiểm tra nationality không rỗng
       filters.nationality = {
-        contains: nationality, // Changed from equals to contains for partial matching
+        contains: nationality.trim(),
         mode: 'insensitive',
       };
     }
+
     if (isActive !== undefined) {
       filters.isActive = isActive;
     }
+
     const players = await this.prisma.player.findMany({
       where: filters,
     });
 
-    if (players.length === 0) {
+    // ✅ Kiểm tra nếu không có cầu thủ thì ném lỗi ngay
+    if (!players || players.length === 0) {
       throw new HttpException(
         'No players found matching the criteria.',
         HttpStatus.NOT_FOUND,

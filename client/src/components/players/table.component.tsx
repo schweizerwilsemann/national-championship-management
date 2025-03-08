@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { getPlayersPagination } from '@/utilities/apis/players/players.api';
+import { getPlayersPagination, filterPlayers } from '@/utilities/apis/players/players.api';
 import SearchPlayerComponent from './search.component';
 import FilterComponent from './filter.component';
 
@@ -41,7 +41,6 @@ const PlayerTable: React.FC<PlayerTableProps> = ({
     const [loading, setLoading] = useState<boolean>(false);
     const [page, setPage] = useState<number>(initialMeta.currentPage);
     const [pageSize] = useState<number>(initialMeta.itemsPerPage);
-    const [totalPages, setTotalPages] = useState<number>(initialMeta.totalPages);
     const [hasMore, setHasMore] = useState<boolean>(true);
     const observer = useRef<IntersectionObserver | null>(null);
 
@@ -53,71 +52,62 @@ const PlayerTable: React.FC<PlayerTableProps> = ({
     const [nationalityFilter, setNationalityFilter] = useState<string>('');
 
     // Fetch players based on current filters and pagination
-    const fetchPlayers = useCallback(async (resetPage: boolean = false) => {
+    const fetchPlayers = useCallback(async (resetPage: boolean = false, searchTerm?: string) => {
         if (loading || (!hasMore && !resetPage)) return;
 
         setLoading(true);
         try {
             const currentPage = resetPage ? 1 : page;
 
-            // Add a small delay to prevent rapid firing of requests
-            await new Promise(resolve => setTimeout(resolve, 1500));
-
-            const response = await getPlayersPagination({
-                page: currentPage,
-                pageSize: pageSize,
-            });
-
-            // Check if response is an array
-            if (Array.isArray(response)) {
-                if (response.length === 0) {
-                    setHasMore(false);
-                } else {
-                    // If we're resetting, replace players, otherwise append
-                    setPlayers(prevPlayers => resetPage ? response : [...prevPlayers, ...response]);
-                    setHasMore(response.length === pageSize); // If we got fewer players than requested, there are no more
-
-                    // Update the page counter for the next fetch
-                    if (!resetPage) {
-                        setPage(prev => prev + 1);
-                    } else {
-                        setPage(2); // If we reset, the next page should be 2
-                    }
-                }
-            } else if (response && 'data' in response) {
-                // Handle structured response with meta data
-                const playerData = response.data || [];
-                const meta = response.meta;
-
-                if (playerData.length === 0) {
-                    setHasMore(false);
-                } else {
-                    setPlayers(prevPlayers => resetPage ? playerData : [...prevPlayers, ...playerData]);
-
-                    if (meta) {
-                        setTotalPages(meta.totalPages);
-                        setHasMore(meta.currentPage < meta.totalPages);
-
-                        // Update the page counter for the next fetch
-                        if (!resetPage) {
-                            setPage(prev => prev + 1);
-                        } else {
-                            setPage(2); // If we reset, the next page should be 2
-                        }
-                    }
-                }
+            await new Promise(resolve => setTimeout(resolve, 500));
+            let response;
+            const currentNameFilter = searchTerm !== undefined ? searchTerm : nameFilter;
+            if (currentNameFilter) {
+                response = await filterPlayers({ name: currentNameFilter });
+            }
+            if (nameFilter) {
+                response = await filterPlayers({ name: nameFilter });
+            } else if (club === "All Clubs") {
+                response = await getPlayersPagination({ page: currentPage, pageSize });
             } else {
-                console.error('Unexpected response structure:', response);
-                setPlayers(resetPage ? [] : players);
+                response = await filterPlayers({
+                    teamId: club,
+                    name: nameFilter,
+                    nationality: nationalityFilter,
+                });
+            }
+
+            // ✅ Kiểm tra response trước khi sử dụng
+            if (!response || typeof response !== "object") {
+                console.error("Invalid response:", response);
+                setPlayers(resetPage ? [] : prevPlayers => [...prevPlayers]);
                 setHasMore(false);
+                return;
+            }
+
+            const playerData = Array.isArray(response) ? response : response.data || [];
+
+            if (!Array.isArray(playerData)) {
+                console.error("Unexpected response structure:", response);
+                setPlayers(resetPage ? [] : prevPlayers => [...prevPlayers]);
+                setHasMore(false);
+                return;
+            }
+
+            if (playerData.length === 0) {
+                setHasMore(false);
+            } else {
+                setPlayers(prevPlayers => resetPage ? playerData : [...prevPlayers, ...playerData]);
+                setHasMore(playerData.length === pageSize);
+                setPage(resetPage ? 2 : page + 1);
             }
         } catch (error) {
-            console.error('Error fetching players:', error);
+            console.error("Error fetching players:", error);
             setHasMore(false);
         } finally {
             setLoading(false);
         }
-    }, [page, pageSize, nameFilter, teamFilter, nationalityFilter, loading, hasMore, players]);
+    }, [page, pageSize, nameFilter, club, nationalityFilter, loading, hasMore]);
 
     // Intersection Observer to trigger loading more players
     const lastPlayerElementRef = useCallback((node: HTMLTableRowElement | null) => {
@@ -141,7 +131,8 @@ const PlayerTable: React.FC<PlayerTableProps> = ({
     useEffect(() => {
         setHasMore(true);
         fetchPlayers(true);
-    }, [nameFilter, season, club]);
+    }, [season, club]);
+
 
     // Reset filters
     const handleResetFilters = () => {
@@ -155,10 +146,14 @@ const PlayerTable: React.FC<PlayerTableProps> = ({
     };
 
     // Handle search input
-    const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
+    const handleSearch = (e?: React.FormEvent<HTMLFormElement>, searchValue?: string) => {
+        if (e) e.preventDefault();
+        setPage(1);
         setHasMore(true);
-        fetchPlayers(true);
+
+        // Use the passed value if provided, otherwise use the state
+        const searchTerm = searchValue !== undefined ? searchValue : nameFilter;
+        fetchPlayers(true, searchTerm);
     };
 
     return (

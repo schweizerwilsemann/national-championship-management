@@ -1,4 +1,10 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { fetchAllTeams } from '@/utilities/apis/teams/teams.api';
+
+interface Team {
+    id: string;
+    name: string;
+}
 
 interface FilterComponentProps {
     season: string;
@@ -15,6 +21,21 @@ const FilterComponent: React.FC<FilterComponentProps> = ({
     setClub,
     handleResetFilters,
 }) => {
+    const [teams, setTeams] = useState<Team[]>([]);
+
+    useEffect(() => {
+        const fetchTeams = async () => {
+            try {
+                const response = await fetchAllTeams(); // Giả định API trả về mảng các đội bóng
+                setTeams(response);
+            } catch (error) {
+                console.error("Error fetching teams:", error);
+            }
+        };
+
+        fetchTeams();
+    }, []);
+
     return (
         <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
             <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto">
@@ -41,11 +62,12 @@ const FilterComponent: React.FC<FilterComponentProps> = ({
                             onChange={(e) => setClub(e.target.value)}
                             className="block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                         >
-                            <option value="All Clubs">All Clubs</option>
-                            <option value="1">Manchester United</option>
-                            <option value="2">Liverpool</option>
-                            <option value="3">Arsenal</option>
-                            {/* Add more clubs as needed */}
+                            <option value="">All Clubs</option>
+                            {teams.map((team) => (
+                                <option key={team.id} value={team.id}>
+                                    {team.name}
+                                </option>
+                            ))}
                         </select>
                     </div>
                 </div>
