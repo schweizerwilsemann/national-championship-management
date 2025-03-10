@@ -1,5 +1,5 @@
 import { PrismaService } from '@/prisma/prisma.service';
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { Match, MatchStatus } from '@prisma/client';
 
 @Injectable()
@@ -42,5 +42,35 @@ export class MatchService {
     );
 
     return groupedMatches; // Return grouped matches
+  }
+  async getTeamMatches(
+    teamId: string,
+    tournamentId?: string,
+    status?: MatchStatus,
+    limit: number = 5,
+  ): Promise<Match[]> {
+    // Validate teamId is provided
+    if (!teamId) {
+      throw new BadRequestException('Team ID is required');
+    }
+
+    // Ensure limit is a number
+    const takeLimit = typeof limit === 'string' ? parseInt(limit, 10) : limit;
+
+    // Query for matches where the team is either home or away
+    return this.prisma.match.findMany({
+      where: {
+        ...(tournamentId && { tournamentId }),
+        ...(status && { status }),
+        OR: [{ homeTeamId: teamId }, { awayTeamId: teamId }],
+      },
+      orderBy: { date: 'desc' },
+      include: {
+        homeTeam: { select: { name: true, logo: true } },
+        awayTeam: { select: { name: true, logo: true } },
+        tournament: { select: { name: true } },
+      },
+      take: takeLimit,
+    });
   }
 }

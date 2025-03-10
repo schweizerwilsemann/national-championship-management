@@ -21,6 +21,34 @@ export class MatchController {
     );
   }
 
+  @Get('finished/team')
+  async getTeamMatches(
+    @Query('teamId') teamId: string,
+    @Query('tournamentId') tournamentId?: string,
+    @Query('status') status?: MatchStatus,
+    @Query('limit') limit: number = 5,
+  ): Promise<Match[]> {
+    return this.matchService.getTeamMatches(
+      teamId,
+      tournamentId,
+      status,
+      limit,
+    );
+  }
+
+  @Get(':tournamentId/postponed')
+  async getPostponedMatches(
+    @Param('tournamentId') tournamentId: string,
+    @Query('page') page: number = 1, // Default to page 1
+    @Query('limit') limit: number = 10, // Default to limit of 10
+  ): Promise<Record<string, Match[]>> {
+    return this.matchService.getMatches(
+      tournamentId,
+      MatchStatus.POSTPONED,
+      page,
+      limit,
+    );
+  }
   @Get(':tournamentId/live')
   async getLiveMatches(
     @Param('tournamentId') tournamentId: string,

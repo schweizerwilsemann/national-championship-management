@@ -168,7 +168,6 @@ const PlayerTable: React.FC<PlayerTableProps> = ({
 
             <div className="bg-white p-6 rounded-b-lg shadow-md">
                 <FilterComponent
-                    season={season}
                     club={club}
                     setSeason={setSeason}
                     setClub={setClub}
