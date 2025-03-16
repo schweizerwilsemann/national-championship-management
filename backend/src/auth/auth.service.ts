@@ -1,4 +1,4 @@
-import { Injectable, Res } from '@nestjs/common';
+import { Injectable, Req, Res, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from '@/prisma/prisma.service'; // Adjust the import path as necessary
 import { RegisterDto } from './dtos/register.dto';
 import { LoginDto } from './dtos/login.dto';
@@ -48,7 +48,41 @@ export class AuthService {
       return { message: 'Internal server error', statusCode: 500 };
     }
   }
+  async profile(@Req() request: any, @Res() response: Response): Promise<void> {
+    try {
+      // Get token from cookie or Authorization header
+      const token =
+        request.cookies?.access_token ||
+        request.headers?.authorization?.split(' ')[1];
 
+      if (!token) {
+        throw new Error('No token provided');
+      }
+
+      // Xác thực token
+      const decoded = this.jwtService.verify(token);
+
+      // Tìm user theo id từ token
+      const user = await this.prisma.user.findUnique({
+        where: { id: decoded.id },
+        select: { id: true, email: true, name: true, role: true },
+      });
+
+      if (!user) {
+        throw new UnauthorizedException('User not found');
+      }
+
+      response.json({
+        statusCode: 200,
+        user,
+      });
+    } catch (error) {
+      response.status(401).json({
+        statusCode: 401,
+        message: 'Invalid or expired token',
+      });
+    }
+  }
   async login(loginDto: LoginDto, @Res() response: Response): Promise<void> {
     const { email, password } = loginDto;
 

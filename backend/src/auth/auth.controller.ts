@@ -1,9 +1,17 @@
-import { Controller, Post, Get, Body, Res, Req } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Get,
+  Body,
+  Req,
+  Res,
+  HttpStatus,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { LoginDto } from './dtos/login.dto';
-import { Response } from 'express';
 import { RegisterDto } from './dtos/register.dto';
-import { Request } from 'express';
+import { LoginDto } from './dtos/login.dto';
+import { Request, Response } from 'express';
 
 @Controller('auth')
 export class AuthController {
@@ -27,5 +35,9 @@ export class AuthController {
   @Get('check-cookie')
   checkCookie(@Req() req: Request) {
     return req.cookies?.access_token || 'No cookie found';
+  }
+  @Get('profile')
+  async profile(@Req() req: any, @Res() res: Response) {
+    await this.authService.profile(req, res);
   }
 }
