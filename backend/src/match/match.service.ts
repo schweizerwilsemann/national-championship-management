@@ -1,6 +1,11 @@
 import { PrismaService } from '@/prisma/prisma.service';
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Match, MatchStatus } from '@prisma/client';
+import { CreateMatchDto, UpdateMatchDto } from './dtos/match.dto';
 
 @Injectable()
 export class MatchService {
@@ -13,6 +18,17 @@ export class MatchService {
     limit: number = 10,
   ): Promise<Record<string, Match[]>> {
     const skip = (page - 1) * limit; // Calculate the number of records to skip
+    const tournament = await this.prisma.tournament.findUnique({
+      where: {
+        id: tournamentId,
+      },
+    });
+
+    if (!tournament) {
+      throw new NotFoundException(
+        `Tournament with ID ${tournamentId} not found`,
+      );
+    }
 
     const matches = await this.prisma.match.findMany({
       where: {
@@ -43,6 +59,7 @@ export class MatchService {
 
     return groupedMatches; // Return grouped matches
   }
+
   async getTeamMatches(
     teamId: string,
     tournamentId?: string,
@@ -71,6 +88,182 @@ export class MatchService {
         tournament: { select: { name: true } },
       },
       take: takeLimit,
+    });
+  }
+
+  async getMatchById(id: string): Promise<Match> {
+    const match = await this.prisma.match.findUnique({
+      where: { id },
+      include: {
+        homeTeam: true,
+        awayTeam: true,
+        tournament: true,
+        goals: {
+          include: {
+            scorer: true,
+          },
+        },
+      },
+    });
+
+    if (!match) {
+      throw new NotFoundException(`Match with ID ${id} not found`);
+    }
+
+    return match;
+  }
+
+  async createMatch(data: CreateMatchDto): Promise<Match> {
+    // Check if tournament exists
+    const tournament = await this.prisma.tournament.findUnique({
+      where: { id: data.tournamentId },
+    });
+
+    if (!tournament) {
+      throw new NotFoundException(
+        `Tournament with ID ${data.tournamentId} not found`,
+      );
+    }
+
+    // Check if home team exists
+    const homeTeam = await this.prisma.team.findUnique({
+      where: { id: data.homeTeamId },
+    });
+
+    if (!homeTeam) {
+      throw new NotFoundException(
+        `Home team with ID ${data.homeTeamId} not found`,
+      );
+    }
+
+    // Check if away team exists
+    const awayTeam = await this.prisma.team.findUnique({
+      where: { id: data.awayTeamId },
+    });
+
+    if (!awayTeam) {
+      throw new NotFoundException(
+        `Away team with ID ${data.awayTeamId} not found`,
+      );
+    }
+
+    // Check that home and away teams are different
+    if (data.homeTeamId === data.awayTeamId) {
+      throw new BadRequestException(
+        'Home team and away team cannot be the same',
+      );
+    }
+
+    // Check that both teams belong to the specified tournament
+    if (
+      homeTeam.tournamentId !== data.tournamentId ||
+      awayTeam.tournamentId !== data.tournamentId
+    ) {
+      throw new BadRequestException(
+        'Both teams must belong to the specified tournament',
+      );
+    }
+
+    return this.prisma.match.create({
+      data: {
+        ...data,
+        date: new Date(data.date),
+      },
+      include: {
+        homeTeam: true,
+        awayTeam: true,
+        tournament: true,
+      },
+    });
+  }
+
+  async updateMatch(id: string, data: UpdateMatchDto): Promise<Match> {
+    // Check if match exists
+    await this.getMatchById(id);
+
+    // If tournamentId is being updated, check if the tournament exists
+    if (data.tournamentId) {
+      const tournament = await this.prisma.tournament.findUnique({
+        where: { id: data.tournamentId },
+      });
+
+      if (!tournament) {
+        throw new NotFoundException(
+          `Tournament with ID ${data.tournamentId} not found`,
+        );
+      }
+    }
+
+    // If homeTeamId is being updated, check if the home team exists
+    if (data.homeTeamId) {
+      const homeTeam = await this.prisma.team.findUnique({
+        where: { id: data.homeTeamId },
+      });
+
+      if (!homeTeam) {
+        throw new NotFoundException(
+          `Home team with ID ${data.homeTeamId} not found`,
+        );
+      }
+    }
+
+    // If awayTeamId is being updated, check if the away team exists
+    if (data.awayTeamId) {
+      const awayTeam = await this.prisma.team.findUnique({
+        where: { id: data.awayTeamId },
+      });
+
+      if (!awayTeam) {
+        throw new NotFoundException(
+          `Away team with ID ${data.awayTeamId} not found`,
+        );
+      }
+    }
+
+    // Check that home and away teams are different if both are being updated
+    if (
+      data.homeTeamId &&
+      data.awayTeamId &&
+      data.homeTeamId === data.awayTeamId
+    ) {
+      throw new BadRequestException(
+        'Home team and away team cannot be the same',
+      );
+    }
+    // Process date if provided
+    const updateData: any = { ...data };
+    if (data.date) {
+      updateData.date = new Date(data.date);
+    }
+    if (data.matchday) {
+      updateData.matchday = parseInt(data.matchday as any, 10); // Ensure it's an integer
+      if (isNaN(updateData.matchday)) {
+        throw new BadRequestException('Matchday must be a valid integer');
+      }
+    }
+
+    return this.prisma.match.update({
+      where: { id },
+      data: updateData,
+      include: {
+        homeTeam: true,
+        awayTeam: true,
+        tournament: true,
+      },
+    });
+  }
+
+  async deleteMatch(id: string): Promise<Match> {
+    // Check if match exists
+    await this.getMatchById(id);
+
+    return this.prisma.match.delete({
+      where: { id },
+      include: {
+        homeTeam: true,
+        awayTeam: true,
+        tournament: true,
+      },
     });
   }
 }

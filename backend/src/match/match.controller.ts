@@ -1,12 +1,27 @@
-import { Controller, Get, Query, Param } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+  Query,
+  UseGuards,
+  UsePipes,
+} from '@nestjs/common';
 import { MatchService } from './match.service';
-import { Match } from '@prisma/client';
-import { MatchStatus } from '@prisma/client'; // Import MatchStatus enum
+import { Match, MatchStatus } from '@prisma/client';
+import { UUIDValidationPipe } from '@/pipes/uuid-validation.pipe';
+import { CreateMatchDto, UpdateMatchDto } from './dtos/match.dto';
+import { Roles } from '@/decorators/roles.decorator';
+import { Public } from '@/decorators/public.decorator';
 
 @Controller('matches')
 export class MatchController {
   constructor(private readonly matchService: MatchService) {}
 
+  @Public()
   @Get(':tournamentId/scheduled')
   async getScheduledMatches(
     @Param('tournamentId') tournamentId: string,
@@ -21,6 +36,7 @@ export class MatchController {
     );
   }
 
+  @Public()
   @Get('finished/team')
   async getTeamMatches(
     @Query('teamId') teamId: string,
@@ -36,6 +52,7 @@ export class MatchController {
     );
   }
 
+  @Public()
   @Get(':tournamentId/postponed')
   async getPostponedMatches(
     @Param('tournamentId') tournamentId: string,
@@ -49,6 +66,8 @@ export class MatchController {
       limit,
     );
   }
+
+  @Public()
   @Get(':tournamentId/live')
   async getLiveMatches(
     @Param('tournamentId') tournamentId: string,
@@ -63,6 +82,7 @@ export class MatchController {
     );
   }
 
+  @Public()
   @Get(':tournamentId/finished')
   async getFinishedMatches(
     @Param('tournamentId') tournamentId: string,
@@ -77,6 +97,7 @@ export class MatchController {
     );
   }
 
+  @Public()
   @Get(':tournamentId')
   async getAllMatches(
     @Param('tournamentId') tournamentId: string,
@@ -85,5 +106,33 @@ export class MatchController {
     @Query('limit') limit: number = 10, // Default to limit of 10
   ): Promise<Record<string, Match[]>> {
     return this.matchService.getMatches(tournamentId, status, page, limit);
+  }
+
+  @Public()
+  @Get('detail/:id')
+  @UsePipes(UUIDValidationPipe)
+  async getMatchById(@Param('id') id: string): Promise<Match> {
+    return this.matchService.getMatchById(id);
+  }
+
+  @Post()
+  @Roles('ADMIN', 'ORGANIZER')
+  async createMatch(@Body() createMatchDto: CreateMatchDto): Promise<Match> {
+    return this.matchService.createMatch(createMatchDto);
+  }
+  @Put(':id')
+  @Roles('ADMIN', 'ORGANIZER')
+  async updateMatch(
+    @Param('id', UUIDValidationPipe) id: string,
+    @Body() updateMatchDto: UpdateMatchDto,
+  ): Promise<Match> {
+    return this.matchService.updateMatch(id, updateMatchDto);
+  }
+
+  @Delete(':id')
+  @Roles('ADMIN')
+  @UsePipes(UUIDValidationPipe)
+  async deleteMatch(@Param('id') id: string): Promise<Match> {
+    return this.matchService.deleteMatch(id);
   }
 }
