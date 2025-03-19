@@ -3,6 +3,7 @@ import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-
 import '@/App.css';
 import LoginPage from '@/pages/login.page';
 import DashboardPage from '@/pages/dashboard.page';
+import UsersPage from '@/pages/UsersPage';
 import { useAuth } from '@/context/auth.context';
 import { Spin } from 'antd';
 import React from 'react';
@@ -37,7 +38,7 @@ const App = () => {
 
   // Only redirect on initial auth determination
   useEffect(() => {
-    if (!loading && authChecked) {  // Đợi authChecked hoàn tất
+    if (!loading && authChecked) {
       const path = location.pathname;
 
       if (path === '/login' && isAuthenticated) {
@@ -46,8 +47,7 @@ const App = () => {
         navigate('/login');
       }
     }
-  }, [loading, isAuthenticated, authChecked]);  // Thêm authChecked vào dependency
-
+  }, [loading, isAuthenticated, authChecked]);
 
   if (loading) {
     return (

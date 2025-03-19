@@ -7,6 +7,7 @@ import './index.css'
 import App from './App.tsx'
 import { AuthProvider } from './context/auth.context'
 import axios from 'axios';
+import { OngoingTourProvider } from './context/ongoing.tournament.context.tsx';
 
 // Configure axios to include credentials (cookies) with all requests
 axios.defaults.withCredentials = true;
@@ -18,7 +19,9 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <AuthProvider>
       <BrowserRouter>
-        <App />
+        <OngoingTourProvider>
+          <App />
+        </OngoingTourProvider>
       </BrowserRouter>
     </AuthProvider>
   </StrictMode>,

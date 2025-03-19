@@ -8,13 +8,18 @@ import {
     UserOutlined,
     LogoutOutlined,
     MenuFoldOutlined,
-    MenuUnfoldOutlined
+    MenuUnfoldOutlined,
+    AimOutlined,
+    TableOutlined
 } from '@ant-design/icons';
 import { useNavigate, useLocation, Routes, Route, Navigate } from 'react-router-dom';
 import TournamentsPage from './tournaments.page';
 import TeamsPage from './teams.page';
+import PlayersPage from './players.page';
 import MatchesPage from './matches.page';
-import UsersPage from './users.page';
+import GoalsPage from './goals.page';
+import StandingsPage from './standings.page';
+import UsersPage from './UsersPage';
 import { useAuth } from '@/context/auth.context';
 
 const { Header, Sider, Content } = Layout;
@@ -69,7 +74,10 @@ const DashboardPage = () => {
         const path = location.pathname;
         if (path.includes('/tournaments')) return 'tournaments';
         if (path.includes('/teams')) return 'teams';
+        if (path.includes('/players')) return 'players';
         if (path.includes('/matches')) return 'matches';
+        if (path.includes('/goals')) return 'goals';
+        if (path.includes('/standings')) return 'standings';
         if (path.includes('/users')) return 'users';
         return 'dashboard';
     };
@@ -118,10 +126,16 @@ const DashboardPage = () => {
                 collapsed={collapsed}
                 theme="dark"
                 width={250}
+                style={{
+                    position: 'sticky',  // Giữ cố định khi cuộn
+                    top: 0,              // Cố định ở đầu trang
+                    height: '100vh',     // Chiều cao full màn hình
+                    overflow: 'hidden'   // Không cho phép cuộn trong sider
+                }}
             >
                 <div className="p-4 flex items-center justify-center">
                     <img
-                        src="src/assets/Premier-League-Logo.png"
+                        src="/src/assets/Premier-League-Logo.png"
                         alt="Championship Logo"
                         className={`
                             transition-all duration-500 ease-in-out
@@ -157,9 +171,24 @@ const DashboardPage = () => {
                             label: 'Teams',
                         },
                         {
+                            key: 'players',
+                            icon: <UserOutlined />,
+                            label: 'Players',
+                        },
+                        {
                             key: 'matches',
                             icon: <CalendarOutlined />,
                             label: 'Matches',
+                        },
+                        {
+                            key: 'goals',
+                            icon: <AimOutlined />,
+                            label: 'Goals',
+                        },
+                        {
+                            key: 'standings',
+                            icon: <TableOutlined />,
+                            label: 'Standings',
                         },
                         {
                             key: 'users',
@@ -191,7 +220,10 @@ const DashboardPage = () => {
                         <Route path="/" element={<DashboardHome />} />
                         <Route path="tournaments" element={<TournamentsPage />} />
                         <Route path="teams" element={<TeamsPage />} />
+                        <Route path="players" element={<PlayersPage />} />
                         <Route path="matches" element={<MatchesPage />} />
+                        <Route path="goals" element={<GoalsPage />} />
+                        <Route path="standings" element={<StandingsPage />} />
                         <Route path="users" element={<UsersPage />} />
                         <Route path="*" element={<Navigate to="" replace />} />
                     </Routes>

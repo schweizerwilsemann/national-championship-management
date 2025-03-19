@@ -1,16 +1,16 @@
 import React, { useState, useCallback } from 'react';
 import EntityManager from '../components/EntityManager';
-import TeamForm from '../components/forms/TeamForm';
+import UserForm from '../components/forms/UserForm';
 
-const TeamsPage: React.FC = () => {
-    const [currentTeam, setCurrentTeam] = useState<any>(null);
+const UsersPage: React.FC = () => {
+    const [currentUser, setCurrentUser] = useState<any>(null);
     const [formMode, setFormMode] = useState<'create' | 'edit'>('create');
 
     const handleCreateForm = useCallback(() => {
-        setCurrentTeam(null);
+        setCurrentUser(null);
         setFormMode('create');
         return (
-            <TeamForm
+            <UserForm
                 mode="create"
                 onSuccess={() => {
                     // Modal will be closed by the EntityManager component
@@ -20,10 +20,10 @@ const TeamsPage: React.FC = () => {
     }, []);
 
     const handleEditForm = useCallback((record: any) => {
-        setCurrentTeam(record);
+        setCurrentUser(record);
         setFormMode('edit');
         return (
-            <TeamForm
+            <UserForm
                 mode="edit"
                 initialValues={record}
                 onSuccess={() => {
@@ -33,7 +33,7 @@ const TeamsPage: React.FC = () => {
         );
     }, []);
 
-    const teamColumns = [
+    const userColumns = [
         {
             title: 'ID',
             dataIndex: 'id',
@@ -46,34 +46,23 @@ const TeamsPage: React.FC = () => {
             key: 'name',
         },
         {
-            title: 'Short Name',
-            dataIndex: 'shortName',
-            key: 'shortName',
-            width: 100,
+            title: 'Email',
+            dataIndex: 'email',
+            key: 'email',
         },
         {
-            title: 'Country',
-            dataIndex: 'country',
-            key: 'country',
-        },
-        {
-            title: 'City',
-            dataIndex: 'city',
-            key: 'city',
-        },
-        {
-            title: 'Stadium',
-            dataIndex: 'stadium',
-            key: 'stadium',
+            title: 'Role',
+            dataIndex: 'role',
+            key: 'role',
         },
     ];
 
     const entities = [
         {
-            key: 'teams',
-            name: 'Team',
-            endpoint: 'teams',
-            columns: teamColumns,
+            key: 'users',
+            name: 'User',
+            endpoint: 'users',
+            columns: userColumns,
             createForm: handleCreateForm,
             editForm: handleEditForm,
         },
@@ -86,4 +75,4 @@ const TeamsPage: React.FC = () => {
     );
 };
 
-export default TeamsPage; 
+export default UsersPage; 
