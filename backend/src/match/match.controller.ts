@@ -22,21 +22,6 @@ export class MatchController {
   constructor(private readonly matchService: MatchService) {}
 
   @Public()
-  @Get(':tournamentId/scheduled')
-  async getScheduledMatches(
-    @Param('tournamentId') tournamentId: string,
-    @Query('page') page: number = 1, // Default to page 1
-    @Query('limit') limit: number = 10, // Default to limit of 10
-  ): Promise<Record<string, Match[]>> {
-    return this.matchService.getMatches(
-      tournamentId,
-      MatchStatus.SCHEDULED,
-      page,
-      limit,
-    );
-  }
-
-  @Public()
   @Get('finished/team')
   async getTeamMatches(
     @Query('teamId') teamId: string,
@@ -51,14 +36,27 @@ export class MatchController {
       limit,
     );
   }
-
+  @Public()
+  @Get(':tournamentId/scheduled')
+  async getScheduledMatches(
+    @Param('tournamentId') tournamentId: string,
+    @Query('page') page: number = 1, // Default to page 1
+    @Query('limit') limit: number = 10, // Default to limit of 10
+  ): Promise<{ data: Record<string, Match[]>; meta: { total: number } }> {
+    return this.matchService.getMatches(
+      tournamentId,
+      MatchStatus.SCHEDULED,
+      page,
+      limit,
+    );
+  }
   @Public()
   @Get(':tournamentId/postponed')
   async getPostponedMatches(
     @Param('tournamentId') tournamentId: string,
     @Query('page') page: number = 1, // Default to page 1
     @Query('limit') limit: number = 10, // Default to limit of 10
-  ): Promise<Record<string, Match[]>> {
+  ): Promise<{ data: Record<string, Match[]>; meta: { total: number } }> {
     return this.matchService.getMatches(
       tournamentId,
       MatchStatus.POSTPONED,
@@ -73,7 +71,7 @@ export class MatchController {
     @Param('tournamentId') tournamentId: string,
     @Query('page') page: number = 1, // Default to page 1
     @Query('limit') limit: number = 10, // Default to limit of 10
-  ): Promise<Record<string, Match[]>> {
+  ): Promise<{ data: Record<string, Match[]>; meta: { total: number } }> {
     return this.matchService.getMatches(
       tournamentId,
       MatchStatus.LIVE,
@@ -88,7 +86,7 @@ export class MatchController {
     @Param('tournamentId') tournamentId: string,
     @Query('page') page: number = 1, // Default to page 1
     @Query('limit') limit: number = 10, // Default to limit of 10
-  ): Promise<Record<string, Match[]>> {
+  ): Promise<{ data: Record<string, Match[]>; meta: { total: number } }> {
     return this.matchService.getMatches(
       tournamentId,
       MatchStatus.FINISHED,
@@ -104,7 +102,7 @@ export class MatchController {
     @Query('status') status?: MatchStatus, // Optional status query parameter
     @Query('page') page: number = 1, // Default to page 1
     @Query('limit') limit: number = 10, // Default to limit of 10
-  ): Promise<Record<string, Match[]>> {
+  ): Promise<{ data: Record<string, Match[]>; meta: { total: number } }> {
     return this.matchService.getMatches(tournamentId, status, page, limit);
   }
 

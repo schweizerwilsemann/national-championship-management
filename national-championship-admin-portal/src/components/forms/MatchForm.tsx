@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { Form, Input, Button, Select, DatePicker, TimePicker, InputNumber, message } from 'antd';
 import axios from 'axios';
 import dayjs from 'dayjs';
-import { useOngoingTour } from '@/context/ongoing.tournament.context';
 
 const { Option } = Select;
 

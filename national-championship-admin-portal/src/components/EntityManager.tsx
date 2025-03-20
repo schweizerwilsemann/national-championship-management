@@ -103,13 +103,16 @@ const EntityManager: React.FC<EntityManagerProps> = ({ entities }) => {
         try {
             let response;
             if (activeKey === "matches" && ongoingTournament?.id) {
-                // Only fetch matches if we have an ongoing tournament
-                response = await axios.get(`/api/v1/${entity.endpoint}/${ongoingTournament.id}`);
+                // Include pagination parameters for matches
+                response = await axios.get(`/api/v1/${entity.endpoint}/${ongoingTournament.id}`, {
+                    params: {
+                        page,
+                        limit: pageSize // Note: backend uses 'limit' instead of 'pageSize'
+                    }
+                });
             } else if (activeKey === "matches") {
-                // If no ongoing tournament, return empty array for matches
-                response = { data: [], meta: { total: 0 } };
+                response = { data: { data: {}, meta: { total: 0 } } };
             } else if (entity.usePagination) {
-                // Use pagination for this entity
                 response = await axios.get(`/api/v1/${entity.endpoint}`, {
                     params: {
                         page,
@@ -117,15 +120,14 @@ const EntityManager: React.FC<EntityManagerProps> = ({ entities }) => {
                     }
                 });
             } else {
-                // No pagination for this entity
                 response = await axios.get(`/api/v1/${entity.endpoint}`);
             }
 
-            // Special handling for matches which might come as grouped objects
+            // Special handling for matches which come as grouped objects
             let dataArray;
-            if (entity.key === 'matches' && typeof response?.data === 'object' && !Array.isArray(response?.data)) {
-                // Extract matches from nested structure (similar to FootballResultsPage)
-                dataArray = Object.values(response?.data || {}).flat();
+            if (entity.key === 'matches' && typeof response?.data?.data === 'object' && !Array.isArray(response?.data?.data)) {
+                // Extract matches from nested structure (grouped by date)
+                dataArray = Object.values(response?.data?.data || {}).flat();
             } else {
                 // Normal array handling for other entities
                 dataArray = ensureArray(response?.data?.data || response?.data || []);
@@ -151,7 +153,6 @@ const EntityManager: React.FC<EntityManagerProps> = ({ entities }) => {
             if (!isEditing) {
                 setData(prev => ({ ...prev, [entityKey]: [] }));
             }
-            setData(prev => ({ ...prev, [entityKey]: [] }));
         } finally {
             setLoading(prev => ({ ...prev, [entityKey]: false }));
         }

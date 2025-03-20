@@ -16,8 +16,8 @@ export class MatchService {
     status?: MatchStatus,
     page: number = 1,
     limit: number = 10,
-  ): Promise<Record<string, Match[]>> {
-    const skip = (page - 1) * limit; // Calculate the number of records to skip
+  ): Promise<{ data: Record<string, Match[]>; meta: { total: number } }> {
+    const skip = (page - 1) * limit;
     const tournament = await this.prisma.tournament.findUnique({
       where: {
         id: tournamentId,
@@ -29,6 +29,14 @@ export class MatchService {
         `Tournament with ID ${tournamentId} not found`,
       );
     }
+
+    // Get total count for pagination
+    const totalMatches = await this.prisma.match.count({
+      where: {
+        tournamentId,
+        ...(status && { status }),
+      },
+    });
 
     const matches = await this.prisma.match.findMany({
       where: {
@@ -57,7 +65,12 @@ export class MatchService {
       {} as Record<string, Match[]>,
     );
 
-    return groupedMatches; // Return grouped matches
+    return {
+      data: groupedMatches,
+      meta: {
+        total: totalMatches,
+      },
+    };
   }
 
   async getTeamMatches(
