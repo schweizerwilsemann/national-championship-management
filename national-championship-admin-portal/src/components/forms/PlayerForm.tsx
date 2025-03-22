@@ -35,7 +35,7 @@ const PlayerForm: React.FC<PlayerFormProps> = ({ initialValues, onSuccess, mode 
     const fetchTeams = async () => {
         try {
             setLoading(true);
-            const response = await axios.get(`${import.meta.env.VITE_API_URL}/teams`);
+            const response = await axios.get(`/api/v1/teams`);
             // Ensure teams is always an array
             setTeams(Array.isArray(response.data) ? response.data : []);
         } catch (error) {
@@ -66,10 +66,10 @@ const PlayerForm: React.FC<PlayerFormProps> = ({ initialValues, onSuccess, mode 
             }
 
             if (mode === 'create') {
-                await axios.post(`${import.meta.env.VITE_API_URL}/players`, formattedValues);
+                await axios.post(`/api/v1/players`, formattedValues);
                 message.success('Player created successfully');
             } else {
-                await axios.put(`${import.meta.env.VITE_API_URL}/players/${initialValues.id}`, formattedValues);
+                await axios.put(`/api/v1/players/${initialValues.id}`, formattedValues);
                 message.success('Player updated successfully');
             }
             form.resetFields();

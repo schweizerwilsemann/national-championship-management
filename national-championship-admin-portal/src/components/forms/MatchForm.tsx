@@ -43,7 +43,7 @@ const MatchForm: React.FC<MatchFormProps> = ({ initialValues, onSuccess, mode })
     const fetchTournaments = async () => {
         try {
             setLoading(true);
-            const response = await axios.get(`${import.meta.env.VITE_API_URL}/tournaments`);
+            const response = await axios.get(`/api/v1/tournaments`);
             setTournaments(Array.isArray(response.data) ? response.data : []);
         } catch (error) {
             console.error('Error fetching tournaments:', error);
@@ -59,7 +59,7 @@ const MatchForm: React.FC<MatchFormProps> = ({ initialValues, onSuccess, mode })
 
         try {
             setLoading(true);
-            const response = await axios.get(`${import.meta.env.VITE_API_URL}/teams/tournament/${tournamentId}`);
+            const response = await axios.get(`/api/v1/teams/tournament/${tournamentId}`);
             setTeams(Array.isArray(response.data) ? response.data : []);
         } catch (error) {
             console.error('Error fetching teams:', error);
@@ -85,10 +85,10 @@ const MatchForm: React.FC<MatchFormProps> = ({ initialValues, onSuccess, mode })
             };
 
             if (mode === 'create') {
-                await axios.post(`${import.meta.env.VITE_API_URL}/matches`, formattedValues);
+                await axios.post(`/api/v1/matches`, formattedValues);
                 message.success('Match created successfully');
             } else {
-                await axios.put(`${import.meta.env.VITE_API_URL}/matches/${initialValues.id}`, formattedValues);
+                await axios.put(`/api/v1/matches/${initialValues.id}`, formattedValues);
                 message.success('Match updated successfully');
             }
             form.resetFields();

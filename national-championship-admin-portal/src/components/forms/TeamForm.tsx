@@ -48,7 +48,7 @@ const TeamForm: React.FC<TeamFormProps> = ({ initialValues, onSuccess, mode }) =
     const fetchTournaments = async () => {
         try {
             setLoading(true);
-            const response = await axios.get(`${import.meta.env.VITE_API_URL}/tournaments`);
+            const response = await axios.get(`/api/v1/tournaments`);
             // Ensure tournaments is always an array
             setTournaments(Array.isArray(response.data) ? response.data : []);
         } catch (error) {
@@ -74,7 +74,7 @@ const TeamForm: React.FC<TeamFormProps> = ({ initialValues, onSuccess, mode }) =
                 formData.append('file', fileList[0].originFileObj);
 
                 // First upload the file
-                const uploadResponse = await axios.post(`${import.meta.env.VITE_API_URL}/upload`, formData);
+                const uploadResponse = await axios.post(`/api/v1/upload`, formData);
 
                 // Then add the logo URL to the formattedValues
                 if (uploadResponse.data && uploadResponse.data.url) {
@@ -83,10 +83,10 @@ const TeamForm: React.FC<TeamFormProps> = ({ initialValues, onSuccess, mode }) =
             }
 
             if (mode === 'create') {
-                await axios.post(`${import.meta.env.VITE_API_URL}/teams`, formattedValues);
+                await axios.post(`/api/v1/teams`, formattedValues);
                 message.success('Team created successfully');
             } else {
-                await axios.put(`${import.meta.env.VITE_API_URL}/teams/${initialValues.id}`, formattedValues);
+                await axios.put(`/api/v1/teams/${initialValues.id}`, formattedValues);
                 message.success('Team updated successfully');
             }
             form.resetFields();
@@ -118,30 +118,6 @@ const TeamForm: React.FC<TeamFormProps> = ({ initialValues, onSuccess, mode }) =
                 rules={[{ required: true, message: 'Please enter a short name' }]}
             >
                 <Input maxLength={3} />
-            </Form.Item>
-
-            <Form.Item
-                name="country"
-                label="Country"
-                rules={[{ required: true, message: 'Please enter a country' }]}
-            >
-                <Input />
-            </Form.Item>
-
-            <Form.Item
-                name="city"
-                label="City"
-                rules={[{ required: true, message: 'Please enter a city' }]}
-            >
-                <Input />
-            </Form.Item>
-
-            <Form.Item
-                name="stadium"
-                label="Stadium"
-                rules={[{ required: true, message: 'Please enter a stadium' }]}
-            >
-                <Input />
             </Form.Item>
 
             <Form.Item

@@ -41,7 +41,7 @@ const GoalForm: React.FC<GoalFormProps> = ({ initialValues, onSuccess, mode }) =
     const fetchMatches = async () => {
         try {
             setLoading(true);
-            const response = await axios.get(`${import.meta.env.VITE_API_URL}/matches`);
+            const response = await axios.get(`/api/v1/matches`);
             setMatches(Array.isArray(response.data) ? response.data : []);
         } catch (error) {
             console.error('Error fetching matches:', error);
@@ -57,7 +57,7 @@ const GoalForm: React.FC<GoalFormProps> = ({ initialValues, onSuccess, mode }) =
 
         try {
             setLoading(true);
-            const response = await axios.get(`${import.meta.env.VITE_API_URL}/matches/${matchId}/players`);
+            const response = await axios.get(`/api/v1/matches/${matchId}/players`);
             setPlayers(Array.isArray(response.data) ? response.data : []);
         } catch (error) {
             console.error('Error fetching players:', error);
@@ -77,10 +77,10 @@ const GoalForm: React.FC<GoalFormProps> = ({ initialValues, onSuccess, mode }) =
     const onFinish = async (values: any) => {
         try {
             if (mode === 'create') {
-                await axios.post(`${import.meta.env.VITE_API_URL}/goals`, values);
+                await axios.post(`/api/v1/goals`, values);
                 message.success('Goal created successfully');
             } else {
-                await axios.put(`${import.meta.env.VITE_API_URL}/goals/${initialValues.id}`, values);
+                await axios.put(`/api/v1/goals/${initialValues.id}`, values);
                 message.success('Goal updated successfully');
             }
             form.resetFields();

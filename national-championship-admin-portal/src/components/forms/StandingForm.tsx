@@ -40,7 +40,7 @@ const StandingForm: React.FC<StandingFormProps> = ({ initialValues, onSuccess, m
     const fetchTournaments = async () => {
         try {
             setLoading(true);
-            const response = await axios.get(`${import.meta.env.VITE_API_URL}/tournaments`);
+            const response = await axios.get(`/api/v1/tournaments`);
             setTournaments(Array.isArray(response.data) ? response.data : []);
         } catch (error) {
             console.error('Error fetching tournaments:', error);
@@ -56,7 +56,7 @@ const StandingForm: React.FC<StandingFormProps> = ({ initialValues, onSuccess, m
 
         try {
             setLoading(true);
-            const response = await axios.get(`${import.meta.env.VITE_API_URL}/teams/tournament/${tournamentId}`);
+            const response = await axios.get(`/api/v1/teams/tournament/${tournamentId}`);
             setTeams(Array.isArray(response.data) ? response.data : []);
         } catch (error) {
             console.error('Error fetching teams:', error);
@@ -82,10 +82,10 @@ const StandingForm: React.FC<StandingFormProps> = ({ initialValues, onSuccess, m
             values.points = (values.won * 3) + values.drawn;
 
             if (mode === 'create') {
-                await axios.post(`${import.meta.env.VITE_API_URL}/standings`, values);
+                await axios.post(`/api/v1/standings`, values);
                 message.success('Standing created successfully');
             } else {
-                await axios.put(`${import.meta.env.VITE_API_URL}/standings/${initialValues.id}`, values);
+                await axios.put(`/api/v1/standings/${initialValues.id}`, values);
                 message.success('Standing updated successfully');
             }
             form.resetFields();
