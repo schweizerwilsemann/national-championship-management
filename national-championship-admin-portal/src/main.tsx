@@ -8,7 +8,9 @@ import App from './App.tsx'
 import { AuthProvider } from './context/auth.context'
 import axios from 'axios';
 import { OngoingTourProvider } from './context/ongoing.tournament.context.tsx';
-
+import { Provider } from 'react-redux';
+import { PersistGate } from 'redux-persist/integration/react';
+import { store, persistor } from './redux/store.ts'
 // Configure axios to include credentials (cookies) with all requests
 axios.defaults.withCredentials = true;
 
@@ -17,12 +19,16 @@ axios.defaults.withCredentials = true;
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <AuthProvider>
-      <BrowserRouter>
-        <OngoingTourProvider>
-          <App />
-        </OngoingTourProvider>
-      </BrowserRouter>
-    </AuthProvider>
+    <PersistGate persistor={persistor}>
+      <Provider store={store}>
+        <AuthProvider>
+          <BrowserRouter>
+            <OngoingTourProvider>
+              <App />
+            </OngoingTourProvider>
+          </BrowserRouter>
+        </AuthProvider>
+      </Provider>
+    </PersistGate>
   </StrictMode>,
 )

@@ -28,6 +28,30 @@ const UserForm: React.FC<UserFormProps> = ({ initialValues, onSuccess, mode }) =
         try {
             if (mode === 'create') {
                 await axios.post(`/api/v1/users`, values);
+                if (values.role === 'ADMIN') {
+                    const mongooseValue = {
+                        username: values.name,
+                        email: values.email,
+                        password: values.password,
+                        isAdmin: true
+                    }
+                    await axios.post(`/api/auth/signup`, mongooseValue);
+                }
+                if (values.role === 'ORGANIZER') {
+                    const mongooseValue = {
+                        username: values.name,
+                        email: values.email,
+                        password: values.password,
+                        isOrganizer: true
+                    }
+                    await axios.post(`/api/auth/signup`, mongooseValue);
+                }
+                const mongooseValue = {
+                    username: values.name,
+                    email: values.email,
+                    password: values.password,
+                }
+                await axios.post(`/api/auth/signup`, mongooseValue);
                 message.success('User created successfully');
             } else {
                 // Don't send password if it's empty
@@ -97,7 +121,7 @@ const UserForm: React.FC<UserFormProps> = ({ initialValues, onSuccess, mode }) =
                     <Option value="USER">User</Option>
                     <Option value="ADMIN">Admin</Option>
                     <Option value="REFEREE">Referee</Option>
-                    <Option value="ADMIN">Organizer</Option>
+                    <Option value="ORGANIZER">Organizer</Option>
 
                 </Select>
             </Form.Item>

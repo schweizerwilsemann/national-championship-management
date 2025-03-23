@@ -1,6 +1,7 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import axios from 'axios';
-
+import { signInStart, signInSuccess, signInFailure, signOutSuccess } from "@/redux/user/userSlice";
+import { useDispatch } from 'react-redux';
 interface User {
     id: string;
     email: string;
@@ -33,6 +34,7 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
+    const dispatch = useDispatch()
     const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
@@ -99,28 +101,48 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         };
     }, [isAuthenticated]);
 
-    const login = async (email: string, password: string): Promise<boolean> => {
-        try {
-            const response = await axios.post('/api/v1/auth/login', { email, password });
+    const login = useCallback(
+        async (email: string, password: string): Promise<boolean> => {
+            dispatch(signInStart());
+            try {
+                // Gọi cả 2 API song song
+                const [mainResponse, socialResponse] = await Promise.all([
+                    axios.post("/api/v1/auth/login", { email, password }), // Backend chính
+                    axios.post("/api/auth/signin", { email, password }) // Backend social
+                ]);
 
-            if (response.data.user && response.data.user.role === "ADMIN") {
-                // The cookie is set by the backend automatically
-                setUser(response.data.user);
-                setIsAuthenticated(true);
-                return true;
+                if (mainResponse.data?.user && socialResponse.data) {
+                    setUser(mainResponse.data.user);
+                    setIsAuthenticated(true);
+                    dispatch(signInSuccess(socialResponse.data)); // ✅ Lưu vào Redux
+                    return true;
+                }
+            } catch (error: any) {
+                dispatch(signInFailure(error?.response?.data?.message || "Đăng nhập thất bại"));
             }
-
             return false;
-        } catch (error) {
-            console.error('Login error:', error);
-            return false;
-        }
-    };
+        },
+        [dispatch]
+    );
 
     const logout = async () => {
         try {
             // Call the logout endpoint to clear the cookie on the server
             await axios.post('/api/v1/auth/logout');
+            try {
+                const res = await fetch(`/api/user/signout`, {
+                    method: 'POST',
+                });
+                const data = await res.json()
+                if (!res.ok) {
+                    console.log(">>> Check sign out error: ", data.error);
+                }
+                else {
+                    dispatch(signOutSuccess());
+                }
+            } catch (error) {
+                console.log(">>> check sign out error: ", error);
+            }
             setIsAuthenticated(false);
             setUser(null);
         } catch (error) {

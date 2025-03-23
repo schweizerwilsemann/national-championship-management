@@ -8,9 +8,20 @@ import commentRoutes from "./routes/comment.route.js";
 import videoRouter from "./routes/video.route.js";
 import cookieParser from "cookie-parser";
 import path from "path";
+import cors from "cors";
 
 dotenv.config();
 
+const isProduction = process.env.NODE_ENV === "production";
+const CLIENT_URL = isProduction
+  ? process.env.CLIENT_PRODUCTION
+  : process.env.CLIENT_DEVELOPMENT;
+
+const ADMIN_PORTAL_URL = isProduction
+  ? process.env.ADMIN_PORTAL_PRODUCTION
+  : process.env.ADMIN_PORTAL_DEVELOPMENT;
+
+const allowedOrigins = [CLIENT_URL, ADMIN_PORTAL_URL].filter(Boolean);
 mongoose
   .connect(process.env.DB_HOST_WITH_DRIVER)
   .then(() => {
@@ -25,6 +36,14 @@ const app = express();
 app.use(express.json());
 app.use(express.text());
 app.use(cookieParser());
+app.use(
+  cors({
+    origin: allowedOrigins,
+    credentials: true, // Cho phép gửi cookie & Authorization header
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 
 app.listen(3330, () => {
   console.log(">>> Server is running on port 3330");

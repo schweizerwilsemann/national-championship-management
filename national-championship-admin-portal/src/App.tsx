@@ -7,6 +7,7 @@ import UsersPage from '@/pages/UsersPage';
 import { useAuth } from '@/context/auth.context';
 import { Spin } from 'antd';
 import React from 'react';
+import CreatePost from './pages/createpost.page';
 
 // Protected route component
 const ProtectedRoute = ({ children }: { children: React.ReactElement }) => {
@@ -72,7 +73,11 @@ const App = () => {
         </ProtectedRoute>
       } />
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
-      <Route path="*" element={<Navigate to="/dashboard" replace />} />
+      <Route path="/create-post" element={
+        <ProtectedRoute>
+          <CreatePost />
+        </ProtectedRoute>
+      } />
     </Routes>
   );
 }

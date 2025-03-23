@@ -10,17 +10,22 @@ import {
     MenuFoldOutlined,
     MenuUnfoldOutlined,
     AimOutlined,
-    TableOutlined
+    TableOutlined,
+    VideoCameraAddOutlined,
+    VideoCameraFilled
 } from '@ant-design/icons';
-import { useNavigate, useLocation, Routes, Route, Navigate } from 'react-router-dom';
+import { useNavigate, useLocation, Routes, Route } from 'react-router-dom';
 import TournamentsPage from './tournaments.page';
 import TeamsPage from './teams.page';
 import PlayersPage from './players.page';
 import MatchesPage from './matches.page';
 import GoalsPage from './goals.page';
 import StandingsPage from './standings.page';
-import UsersPage from './UsersPage';
+import UsersPage from './users.page';
 import { useAuth } from '@/context/auth.context';
+import ProfilePage from './profile.page';
+import VideosStatsPage from './video.stats.page';
+import VideosPage from './video.page';
 
 const { Header, Sider, Content } = Layout;
 const { Title } = Typography;
@@ -79,6 +84,9 @@ const DashboardPage = () => {
         if (path.includes('/goals')) return 'goals';
         if (path.includes('/standings')) return 'standings';
         if (path.includes('/users')) return 'users';
+        if (path.includes('/videos-page')) return 'videos-page';
+        if (path.includes('/videos-stats')) return 'videos-stats';
+
         return 'dashboard';
     };
 
@@ -98,6 +106,9 @@ const DashboardPage = () => {
             navigate(`/dashboard/${key}`);
         }
     };
+    const handleNavigateToProfile = () => {
+        navigate('/dashboard/profile');
+    }
 
     // Set the active tab based on the URL when the component mounts
     useEffect(() => {
@@ -109,6 +120,7 @@ const DashboardPage = () => {
             key: 'profile',
             icon: <UserOutlined />,
             label: 'Profile',
+            onClick: handleNavigateToProfile,
         },
         {
             key: 'logout',
@@ -195,6 +207,16 @@ const DashboardPage = () => {
                             icon: <UserOutlined />,
                             label: 'Users',
                         },
+                        {
+                            key: 'videos-page',
+                            icon: <VideoCameraFilled />,
+                            label: 'Videos',
+                        },
+                        {
+                            key: 'videos-stats',
+                            icon: <VideoCameraAddOutlined />,
+                            label: 'Videos Statistics',
+                        },
                     ]}
                 />
             </Sider>
@@ -225,7 +247,9 @@ const DashboardPage = () => {
                         <Route path="goals" element={<GoalsPage />} />
                         <Route path="standings" element={<StandingsPage />} />
                         <Route path="users" element={<UsersPage />} />
-                        <Route path="*" element={<Navigate to="" replace />} />
+                        <Route path='profile' element={< ProfilePage />} />
+                        <Route path='videos-stats' element={< VideosStatsPage />} />
+                        <Route path='videos-page' element={< VideosPage />} />
                     </Routes>
                 </Content>
             </Layout>
