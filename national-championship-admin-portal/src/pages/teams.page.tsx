@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
-import EntityManager from '../components/EntityManager';
-import TeamForm from '../components/forms/TeamForm';
+import EntityManager from '@/components/EntityManager';
+import TeamForm from '@/components/forms/TeamForm';
 
 const TeamsPage: React.FC = () => {
     const [currentTeam, setCurrentTeam] = useState<any>(null);

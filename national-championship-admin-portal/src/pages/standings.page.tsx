@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
-import EntityManager from '../components/EntityManager';
-import StandingForm from '../components/forms/StandingForm';
+import EntityManager from '@/components/EntityManager';
+import StandingForm from '@/components/forms/StandingForm';
 
 const StandingsPage: React.FC = () => {
     const [currentStanding, setCurrentStanding] = useState<any>(null);

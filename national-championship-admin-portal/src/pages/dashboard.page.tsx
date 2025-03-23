@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Layout, Menu, Typography, Avatar, Dropdown, Button } from 'antd';
 import {
     DashboardOutlined,
@@ -82,9 +82,9 @@ const DashboardPage = () => {
         return 'dashboard';
     };
 
-    const toggleCollapsed = () => {
+    const toggleCollapsed = useCallback(() => {
         setCollapsed(!collapsed);
-    };
+    }, [collapsed]);
 
     const handleLogout = () => {
         logout();

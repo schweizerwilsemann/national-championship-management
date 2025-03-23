@@ -15,6 +15,7 @@ interface EntityManagerProps {
         usePagination?: boolean; // Add this flag to enable pagination for specific entities
     }[];
 }
+interface ICollapse { }
 
 // Helper function to ensure data is always an array
 const ensureArray = (data: any): any[] => {
@@ -133,8 +134,13 @@ const EntityManager: React.FC<EntityManagerProps> = ({ entities }) => {
                 dataArray = ensureArray(response?.data?.data || response?.data || []);
             }
 
-            console.log(`Fetched ${entity.key} data:`, dataArray);
-            setData(prev => ({ ...prev, [entityKey]: dataArray }));
+            setData(prev => {
+                // Nếu dữ liệu mới giống dữ liệu cũ, giữ nguyên state để tránh render lại
+                if (JSON.stringify(prev[entityKey]) === JSON.stringify(dataArray)) {
+                    return prev;
+                }
+                return { ...prev, [entityKey]: dataArray };
+            });
 
             // Update pagination state if we have meta information
             if (response?.data?.meta) {
@@ -182,7 +188,8 @@ const EntityManager: React.FC<EntityManagerProps> = ({ entities }) => {
             fetchData(activeKey, currentPagination.current, currentPagination.pageSize);
             fetchDeletedData(activeKey);
         }
-    }, [activeKey, isEditing, isCreating]);
+    }, [activeKey, isEditing, isCreating])
+
 
     const handleTabChange = (key: string) => {
         setActiveKey(key);

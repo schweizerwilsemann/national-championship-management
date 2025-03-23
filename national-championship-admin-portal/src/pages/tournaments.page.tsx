@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
-import EntityManager from '../components/EntityManager';
-import TournamentForm from '../components/forms/TournamentForm';
+import EntityManager from '@/components/EntityManager';
+import TournamentForm from '@/components/forms/TournamentForm';
 
 const TournamentsPage: React.FC = () => {
     const [currentTournament, setCurrentTournament] = useState<any>(null);

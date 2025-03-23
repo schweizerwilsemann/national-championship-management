@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
-import EntityManager from '../components/EntityManager';
-import MatchForm from '../components/forms/MatchForm';
+import EntityManager from '@/components/EntityManager';
+import MatchForm from '@/components/forms/MatchForm';
 import { Tag } from 'antd';
 
 const MatchesPage: React.FC = () => {

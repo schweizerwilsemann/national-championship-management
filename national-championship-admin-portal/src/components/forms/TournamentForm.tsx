@@ -33,10 +33,10 @@ const TournamentForm: React.FC<TournamentFormProps> = ({ initialValues, onSucces
             };
 
             if (mode === 'create') {
-                await axios.post(`${import.meta.env.VITE_API_URL}/tournaments`, formattedValues);
+                await axios.post(`/api/v1/tournaments`, formattedValues);
                 message.success('Tournament created successfully');
             } else {
-                await axios.put(`${import.meta.env.VITE_API_URL}/tournaments/${initialValues.id}`, formattedValues);
+                await axios.put(`/api/v1/tournaments/${initialValues.id}`, formattedValues);
                 message.success('Tournament updated successfully');
             }
             form.resetFields();

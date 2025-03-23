@@ -96,6 +96,9 @@ const UserForm: React.FC<UserFormProps> = ({ initialValues, onSuccess, mode }) =
                 <Select>
                     <Option value="USER">User</Option>
                     <Option value="ADMIN">Admin</Option>
+                    <Option value="REFEREE">Referee</Option>
+                    <Option value="ADMIN">Organizer</Option>
+
                 </Select>
             </Form.Item>
 

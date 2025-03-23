@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
-import EntityManager from '../components/EntityManager';
-import UserForm from '../components/forms/UserForm';
+import EntityManager from '@/components/EntityManager';
+import UserForm from '@/components/forms/UserForm';
 
 const UsersPage: React.FC = () => {
     const [currentUser, setCurrentUser] = useState<any>(null);

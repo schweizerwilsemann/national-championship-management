@@ -1,6 +1,6 @@
 import { Form, Input, Button, message } from 'antd';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/auth.context';
+import { useAuth } from '@/context/auth.context';
 
 const LoginPage = () => {
     const { login } = useAuth();

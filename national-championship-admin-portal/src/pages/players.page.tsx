@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
-import EntityManager from '../components/EntityManager';
-import PlayerForm from '../components/forms/PlayerForm';
+import EntityManager from '@/components/EntityManager';
+import PlayerForm from '@/components/forms/PlayerForm';
 import { Tag } from 'antd';
 
 const PlayersPage: React.FC = () => {

@@ -97,7 +97,7 @@ const GoalsPage: React.FC = () => {
             render: (text: string, record: any) => {
                 const scorer = record.scorer;
                 if (!scorer) return 'N/A';
-                return `${scorer.name} (${scorer.team?.name})`;
+                return `${scorer.name} - (${scorer.team.name})`;
             },
         },
         {
