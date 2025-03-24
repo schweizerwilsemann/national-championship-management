@@ -45,7 +45,9 @@ const VideosPage: FC = () => {
     useEffect(() => {
         fetchVideos();
     }, []);
-
+    useEffect(() => {
+        console.log(">>>> modal visible: ", modalVisible)
+    }, [modalVisible])
     // Handle form submission
     const handleSubmit = async (values: any) => {
         try {
@@ -82,7 +84,7 @@ const VideosPage: FC = () => {
             embedUrl: record.embedUrl,
             category: record.category,
             tags: record.tags,
-            thumbnail: record.thumbnail
+            thumbnail: record.thumbnail,
         });
         setModalVisible(true);
     };
@@ -101,10 +103,10 @@ const VideosPage: FC = () => {
 
     // Open modal for new video
     const handleAddNew = () => {
-        setCurrentVideo(null);
-        form.resetFields(); // Reset form trước
+        form.resetFields(); // Reset form ngay lập tức
+        setCurrentVideo(null); // Đặt currentVideo thành null trước khi mở modal
         setModalTitle('Add New Video');
-        setModalVisible(true);
+        setTimeout(() => setModalVisible(true), 0); // Đợi state cập nhật trước khi hiển thị modal
     };
 
 
@@ -127,11 +129,11 @@ const VideosPage: FC = () => {
     };
     const handleModalClose = () => {
         setModalVisible(false);
-        // Always reset form when closing modal
-        form.resetFields();
-        // Reset currentVideo when modal closes
-        setCurrentVideo(null);
+        form.resetFields(); // Reset form ngay khi modal đóng
+        setCurrentVideo(null); // Reset currentVideo luôn
+        console.log(">>> I am done");
     };
+
     // Table columns
     const columns: ColumnsType<VideoData> = [
         {
@@ -279,7 +281,7 @@ const VideosPage: FC = () => {
             <Modal
                 title={modalTitle}
                 open={modalVisible}
-                onCancel={handleModalClose}
+                onCancel={() => handleModalClose()}
                 footer={[
                     <Button key="cancel" onClick={handleModalClose}>
                         Cancel
