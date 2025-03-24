@@ -1,4 +1,4 @@
-import instance from "@/utilities/customize/axios.customize";
+import { instance } from "@/utilities/customize/axios.customize";
 
 const url = `/tournaments`;
 

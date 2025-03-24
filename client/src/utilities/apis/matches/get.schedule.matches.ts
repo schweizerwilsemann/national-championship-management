@@ -1,4 +1,4 @@
-import instance from "@/utilities/customize/axios.customize";
+import { instance } from "@/utilities/customize/axios.customize";
 
 export const getScheduledMatches = async (
   id: string,
@@ -12,9 +12,12 @@ export const getScheduledMatches = async (
         limit: params?.limit || 10,
       },
     });
+
+    // Ensure we return only the necessary data structure
+    // Assuming the API returns { data: {...}, meta: {...} }
     return response;
   } catch (error) {
-    console.error("Error fetching standings:", error);
+    console.error("Error fetching scheduled matches:", error);
     throw error;
   }
 };

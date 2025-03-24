@@ -1,9 +1,9 @@
-import instance from "@/utilities/customize/axios.customize";
+import { instance } from "@/utilities/customize/axios.customize";
 
 // Replace 'yourTournamentId' with the actual tournament ID
 
-export const fetchStanding = async (id: string) => {
-  const url = `/standings/${id}`;
+export const fetchStanding = async (tournamentId: string) => {
+  const url = `/standings/tournament/${tournamentId}`;
   try {
     const response = await instance.get(url);
     return response;

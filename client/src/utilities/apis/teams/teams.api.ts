@@ -1,4 +1,4 @@
-import instance from "@/utilities/customize/axios.customize";
+import { instance } from "@/utilities/customize/axios.customize";
 import { GetServerSideProps } from "next";
 export interface Team {
   id: string;

@@ -1,4 +1,4 @@
-import instance from "@/utilities/customize/axios.customize";
+import { instance } from "@/utilities/customize/axios.customize";
 
 export const getFinishedMatches = async (
   id: string,
@@ -12,7 +12,7 @@ export const getFinishedMatches = async (
         limit: params?.limit || 10,
       },
     });
-    return response;
+    return response.data;
   } catch (error) {
     console.error("Error fetching standings:", error);
     throw error;
