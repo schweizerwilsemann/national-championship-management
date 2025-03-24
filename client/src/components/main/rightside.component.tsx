@@ -4,6 +4,7 @@ import MenuToggle from './menu.toggle.component'
 import Link from 'next/link'
 import { checkCookie } from '@/utilities/apis/authentication/checkcookie.api'
 import { signOut, socialSignOut } from '@/utilities/apis/authentication/signout.api'
+import PrimaryNavigation from './primary.navigation.component'
 
 const RightSideComponent = () => {
     const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
@@ -37,6 +38,7 @@ const RightSideComponent = () => {
     };
     return (
         <div className="flex items-center space-x-4">
+
             <span className="hidden lg:inline-block text-sm">More than a game</span>
             {isLoggedIn ? (
                 <button onClick={handleSignOut} className="bg-transparent text-[#37003c] px-4 py-2 rounded-md text-sm font-medium hover:cursor-pointer">
