@@ -5,15 +5,12 @@ import Image from 'next/image';
 import { getNews } from '@/utilities/apis/socials/news/news.api';
 import Link from 'next/link';
 
-interface NewsDetailPageProps {
-    params: {
-        slug: string;
-    };
-}
-
-export default async function NewsDetailPage({ params }: NewsDetailPageProps) {
+export default async function NewsDetailPage({
+    params,
+}: Readonly<{ params: Promise<{ slug: string }> }>) {
     try {
-        const response = await getNews({ slug: params.slug });
+        const { slug } = await params; // Đợi params resolve trước khi dùng
+        const response = await getNews({ slug });
         const post = response.posts[0]; // Assuming the API returns the specific post
 
         if (!post) {
