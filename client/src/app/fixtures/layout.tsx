@@ -1,5 +1,5 @@
 import React from 'react'
-import PremierLeagueLayout from '@/app/PremierLeagueLayout'
+import PremierLeagueLayout from '@/components/layouts/PremierLeagueLayout'
 const FixturesLayout = ({ children }: { children: React.ReactNode }) => {
     return (
         <PremierLeagueLayout>
