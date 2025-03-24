@@ -9,6 +9,11 @@ import { TournamentModule } from '@/tournament/tournament.module';
 import { MatchModule } from '@/match/match.module';
 import { PlayerModule } from '@/player/player.module';
 import { TeamModule } from '@/team/team.module';
+import { GoalModule } from '@/goal/goal.module';
+import { UserModule } from '@/user/user.module';
+import { APP_GUARD } from '@nestjs/core';
+import { JwtAuthGuard } from '@/guards/jwt-auth.guard';
+import { RolesGuard } from '@/guards/roles.guard';
 
 @Module({
   imports: [
@@ -20,8 +25,20 @@ import { TeamModule } from '@/team/team.module';
     MatchModule,
     PlayerModule,
     TeamModule,
+    GoalModule,
+    UserModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard, // Đăng ký Global Guard cho xác thực JWT
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard, // Đăng ký Global Guard cho kiểm tra quyền
+    },
+  ],
 })
 export class AppModule {}
