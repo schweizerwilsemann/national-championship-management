@@ -10,6 +10,46 @@ import { CreateMatchDto, UpdateMatchDto } from './dtos/match.dto';
 @Injectable()
 export class MatchService {
   constructor(private readonly prisma: PrismaService) {}
+  private groupMatchesByDate(matches: Match[], totalMatches: number) {
+    const groupedMatches = matches.reduce(
+      (acc, match) => {
+        const date = match.date.toISOString().split('T')[0];
+        if (!acc[date]) {
+          acc[date] = [];
+        }
+        acc[date].push(match);
+        return acc;
+      },
+      {} as Record<string, Match[]>,
+    );
+
+    return { data: groupedMatches, meta: { total: totalMatches } };
+  }
+
+  async getScheduledMatches(
+    tournamentId: string,
+    page: number = 1,
+    limit: number = 10,
+  ): Promise<{ data: Record<string, Match[]>; meta: { total: number } }> {
+    const skip = (page - 1) * limit;
+
+    const totalMatches = await this.prisma.match.count({
+      where: { tournamentId, status: MatchStatus.SCHEDULED },
+    });
+
+    const matches = await this.prisma.match.findMany({
+      where: { tournamentId, status: MatchStatus.SCHEDULED },
+      orderBy: { date: 'asc' }, // Sắp xếp theo ngày tăng dần
+      include: {
+        homeTeam: { select: { name: true, logo: true } },
+        awayTeam: { select: { name: true, logo: true } },
+      },
+      skip,
+      take: Number(limit),
+    });
+
+    return this.groupMatchesByDate(matches, totalMatches);
+  }
 
   async getMatches(
     tournamentId: string,

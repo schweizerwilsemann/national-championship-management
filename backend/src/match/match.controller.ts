@@ -7,7 +7,6 @@ import {
   Post,
   Put,
   Query,
-  UseGuards,
   UsePipes,
 } from '@nestjs/common';
 import { MatchService } from './match.service';
@@ -37,19 +36,16 @@ export class MatchController {
     );
   }
   @Public()
+  @Public()
   @Get(':tournamentId/scheduled')
   async getScheduledMatches(
     @Param('tournamentId') tournamentId: string,
-    @Query('page') page: number = 1, // Default to page 1
-    @Query('limit') limit: number = 10, // Default to limit of 10
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
   ): Promise<{ data: Record<string, Match[]>; meta: { total: number } }> {
-    return this.matchService.getMatches(
-      tournamentId,
-      MatchStatus.SCHEDULED,
-      page,
-      limit,
-    );
+    return this.matchService.getScheduledMatches(tournamentId, page, limit);
   }
+
   @Public()
   @Get(':tournamentId/postponed')
   async getPostponedMatches(
