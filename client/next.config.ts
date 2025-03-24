@@ -1,16 +1,27 @@
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
-  /* config options here */
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: process.env.NEXT_PUBLIC_IMAGES_API_ULR,
+      },
+      {
+        protocol: "https",
+        hostname: process.env.NEXT_PUBLIC_VIDEOS_URL,
+      },
+    ],
+  },
   env: {
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
+    NEXT_PUBLIC_SOCIAL_API_URL: process.env.NEXT_PUBLIC_SOCIAL_API_URL,
   },
   async redirects() {
     return [
       {
         source: "/home",
         destination: "/",
-        permanent: true, // Hoặc false nếu bạn muốn redirect tạm thời
+        permanent: true,
       },
     ];
   },

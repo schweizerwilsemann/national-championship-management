@@ -28,9 +28,6 @@ interface SearchParams {
     searchTerm?: string;
 }
 
-interface NewsPageProps {
-    searchParams?: SearchParams;
-}
 
 // Pre-defined category options
 const categoryOptions = [
