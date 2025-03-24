@@ -1,5 +1,5 @@
 import React from 'react'
-import PremierLeagueLayout from '@/app/PremierLeagueLayout'
+import PremierLeagueLayout from '@/components/layouts/PremierLeagueLayout'
 import TournamentDropdown from '@/components/tournaments/tournament.dropdownlist'
 const StandingsPage = () => {
     return (
