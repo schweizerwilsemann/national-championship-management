@@ -1,8 +1,8 @@
 "use client"
 import React, { useState } from 'react';
-import PremierLeagueLayout from '@/app/PremierLeagueLayout';
+import PremierLeagueLayout from '@/components/layouts/PremierLeagueLayout';
 import Link from 'next/link';
-import { signup } from '@/utilities/apis/authentication/signup.api'; // Import the signup function
+import { signup, socialSignUp } from '@/utilities/apis/authentication/signup.api'; // Import the signup function
 import { message } from 'antd'; // Import Ant Design message
 import { useRouter } from 'next/navigation'; // Change import to useRouter from next/navigation
 
@@ -17,6 +17,7 @@ export default function SignUpPage() {
 
         try {
             const response = await signup(email, password, name);
+            await socialSignUp(email, password, name);
             if (response.statusCode === 201) {
                 message.success(`${response.message}! Please sign in to continue`); // Display success message
                 // Clear input fields

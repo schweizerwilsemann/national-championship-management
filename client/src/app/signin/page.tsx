@@ -1,8 +1,8 @@
 "use client"
 import React, { useState } from 'react';
-import PremierLeagueLayout from '@/app/PremierLeagueLayout';
+import PremierLeagueLayout from '@/components/layouts/PremierLeagueLayout';
 import Link from 'next/link';
-import { login } from '@/utilities/apis/authentication/signin.api'; // Import the login function
+import { login, socialLogin } from '@/utilities/apis/authentication/signin.api'; // Import the login function
 import { useRouter } from 'next/navigation'; // Import useRouter for navigation
 import { message } from 'antd'; // Import Ant Design message
 
@@ -16,6 +16,7 @@ export default function SignIn() {
 
         try {
             const response = await login(email, password);
+            await socialLogin(email, password);
             if (response?.statusCode === 200) {
                 message.success('Login successful!'); // Display success message
                 router.push('/'); // Navigate to home page
