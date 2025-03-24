@@ -1,7 +1,7 @@
 import React from 'react'
 import PremierLeagueLogo from './premierleague.logo'
-import PrimaryNavigation from './primary.navigation.component'
 import RightSideComponent from './rightside.component'
+import PrimaryNavigation from './primary.navigation.component'
 
 const MainNavigation = () => {
     return (
@@ -10,10 +10,9 @@ const MainNavigation = () => {
                 <div className="flex items-center justify-between py-4">
                     {/* Logo */}
                     <PremierLeagueLogo />
-
-                    {/* Primary Navigation */}
-                    <PrimaryNavigation />
-
+                    <div className="mr-3">
+                        <PrimaryNavigation />
+                    </div>
                     {/* Right side - "More than a game" and Sign In/Out */}
                     <RightSideComponent />
                 </div>

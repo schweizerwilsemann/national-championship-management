@@ -10,6 +10,10 @@ const nextConfig = {
         protocol: "https",
         hostname: process.env.NEXT_PUBLIC_VIDEOS_URL,
       },
+      {
+        protocol: "https",
+        hostname: "pbs.twimg.com",
+      },
     ],
   },
   env: {
