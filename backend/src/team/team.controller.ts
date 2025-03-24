@@ -1,13 +1,66 @@
 import { TeamService } from './team.service';
 import { Team } from '@prisma/client';
-import { Controller, Get, Param, UsePipes } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+  UseGuards,
+  UsePipes,
+} from '@nestjs/common';
+import { UUIDValidationPipe } from '@/pipes/uuid-validation.pipe';
+import { CreateTeamDto, UpdateTeamDto } from './dtos/team.dto';
+import { Roles } from '@/decorators/roles.decorator';
+import { Public } from '@/decorators/public.decorator';
 
 @Controller('teams')
 export class TeamController {
   constructor(private readonly teamService: TeamService) {}
 
+  @Public()
   @Get()
-  async getAllTeam(): Promise<Team[]> {
+  async getAllTeams(): Promise<Team[]> {
     return this.teamService.getAllTeams();
+  }
+
+  @Public()
+  @Get('tournament/:tournamentId')
+  @UsePipes(UUIDValidationPipe)
+  async getTeamsByTournament(
+    @Param('tournamentId') tournamentId: string,
+  ): Promise<Team[]> {
+    return this.teamService.getTeamsByTournament(tournamentId);
+  }
+
+  @Public()
+  @Get(':id')
+  @UsePipes(UUIDValidationPipe)
+  async getTeamById(@Param('id') id: string): Promise<Team> {
+    return this.teamService.getTeamById(id);
+  }
+
+  @Post()
+  @Roles('ADMIN', 'ORGANIZER')
+  async createTeam(@Body() createTeamDto: CreateTeamDto): Promise<Team> {
+    return this.teamService.createTeam(createTeamDto);
+  }
+
+  @Put(':id')
+  @Roles('ADMIN', 'ORGANIZER')
+  async updateTeam(
+    @Param('id') id: string,
+    @Body() updateTeamDto: UpdateTeamDto,
+  ): Promise<Team> {
+    return this.teamService.updateTeam(id, updateTeamDto);
+  }
+
+  @Delete(':id')
+  @Roles('ADMIN')
+  @UsePipes(UUIDValidationPipe)
+  async deleteTeam(@Param('id') id: string): Promise<Team> {
+    return this.teamService.deleteTeam(id);
   }
 }
