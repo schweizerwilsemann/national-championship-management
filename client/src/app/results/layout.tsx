@@ -1,12 +1,12 @@
 import React from 'react'
-import PremierLeagueLayout from '@/app/PremierLeagueLayout'
+import PremierLeagueLayout from '@/components/layouts/PremierLeagueLayout'
 import TournamentDropdown from '@/components/tournaments/tournament.dropdownlist'
 
 const ResultsLayout = ({ children }: { children: React.ReactNode }) => {
     return (
         <PremierLeagueLayout>
             {/* Filters Section */}
-            <div className="flex flex-col md:flex-row gap-4 mb-4 justify-center items-center">
+            <div className="flex flex-col md:flex-row gap-4 mb-4 justify-center items-center mt-4">
                 <select className="p-2 border border-gray-300 rounded">
                     <option value="premier-league">Premier League</option>
                 </select>
