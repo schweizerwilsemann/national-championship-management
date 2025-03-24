@@ -16,11 +16,14 @@ const VideoForm: FC<VideoFormProps> = ({ form, initialData, handleSubmit }) => {
     const [urlError, setUrlError] = useState<string | null>(null);
 
     // Handle form for tags (converting string to array)
-    const normalizeTags = (value: string | string[]): string[] => {
-        if (!value) return [];
-        if (Array.isArray(value)) return value;
-        return value.split(',').map(tag => tag.trim());
+    const normalizeTags = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value;
+        if (typeof value === 'string') {
+            return value.split(',').map(tag => tag.trim()); // Tách và loại bỏ khoảng trắng
+        }
+        return []; // Nếu không phải chuỗi, trả về mảng rỗng
     };
+
 
     // Extract YouTube video ID from various YouTube URL formats
     const extractYoutubeId = (url: string): string | null => {
@@ -140,7 +143,7 @@ const VideoForm: FC<VideoFormProps> = ({ form, initialData, handleSubmit }) => {
 
             <Form.Item
                 name="tags"
-                label="Tags"
+                label="Tags - (Separate by commas, if you want to delete, hit the control + delete)"
                 getValueFromEvent={normalizeTags}
                 getValueProps={(value) => ({ value: Array.isArray(value) ? value.join(', ') : value })}
             >
