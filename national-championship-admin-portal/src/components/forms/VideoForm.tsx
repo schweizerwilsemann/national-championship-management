@@ -1,10 +1,10 @@
-// VideoForm.tsx
-import { FC } from 'react';
-import { Form, Input, Select, Row, Col } from 'antd';
+import { FC, useState } from 'react';
+import { Form, Input, Select, Row, Col, Typography } from 'antd';
 import { VideoData } from '@/types/types';
 
 const { TextArea } = Input;
 const { Option } = Select;
+const { Text } = Typography;
 
 interface VideoFormProps {
     form: any; // Form instance from antd
@@ -13,11 +13,53 @@ interface VideoFormProps {
 }
 
 const VideoForm: FC<VideoFormProps> = ({ form, initialData, handleSubmit }) => {
+    const [urlError, setUrlError] = useState<string | null>(null);
+
     // Handle form for tags (converting string to array)
     const normalizeTags = (value: string | string[]): string[] => {
         if (!value) return [];
         if (Array.isArray(value)) return value;
         return value.split(',').map(tag => tag.trim());
+    };
+
+    // Extract YouTube video ID from various YouTube URL formats
+    const extractYoutubeId = (url: string): string | null => {
+        if (!url) return null;
+
+        // Try to match different YouTube URL patterns
+        const patterns = [
+            /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&?\/]+)/i,
+            /youtube\.com\/shorts\/([^&?\/]+)/i
+        ];
+
+        for (const pattern of patterns) {
+            const match = url.match(pattern);
+            if (match && match[1]) {
+                return match[1];
+            }
+        }
+
+        return null;
+    };
+
+    // Handle YouTube URL paste
+    const handleYoutubeUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const url = e.target.value.trim();
+        setUrlError(null);
+
+        if (!url) return;
+
+        const videoId = extractYoutubeId(url);
+
+        if (videoId) {
+            form.setFieldsValue({
+                videoId,
+                embedUrl: `https://www.youtube.com/embed/${videoId}?si=Kf1P4fzLzTR_gLOy`,
+                thumbnail: `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`
+            });
+        } else {
+            setUrlError('Could not extract YouTube video ID from this URL');
+        }
     };
 
     return (
@@ -42,6 +84,18 @@ const VideoForm: FC<VideoFormProps> = ({ form, initialData, handleSubmit }) => {
                 <TextArea
                     rows={4}
                     placeholder="Video description"
+                />
+            </Form.Item>
+
+            <Form.Item
+                name="youtubeUrl"
+                label="YouTube URL"
+                help={urlError ? <Text type="danger">{urlError}</Text> : "Paste a YouTube URL to automatically extract the video ID"}
+                validateStatus={urlError ? "error" : ""}
+            >
+                <Input
+                    placeholder="https://www.youtube.com/watch?v=9EygzJQXqVk"
+                    onChange={handleYoutubeUrlChange}
                 />
             </Form.Item>
 
