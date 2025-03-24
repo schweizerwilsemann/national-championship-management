@@ -134,10 +134,8 @@ export const subNavItems = [
   "Fixtures",
   "Results",
   "Standings",
-  "Transfers",
-  "Injury news",
   "News",
-  "Video",
+  "Videos",
   "Clubs",
   "Players",
 ];
