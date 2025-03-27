@@ -1,9 +1,11 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
   Get,
   Param,
+  ParseIntPipe,
   Post,
   Put,
   Query,
@@ -88,6 +90,36 @@ export class MatchController {
       MatchStatus.FINISHED,
       page,
       limit,
+    );
+  }
+
+  @Public()
+  @Get('search')
+  async searchMatches(
+    @Query('searchTerm') searchTerm: string,
+    @Query('page', new ParseIntPipe({ optional: true })) page?: number,
+    @Query('limit', new ParseIntPipe({ optional: true })) limit?: number,
+    @Query('tournamentId') tournamentId?: string,
+    @Query('status') status?: string,
+  ) {
+    // Validate status if provided
+    let validatedStatus: MatchStatus | undefined;
+    if (status) {
+      // Check if the provided status is a valid MatchStatus
+      if (!Object.values(MatchStatus).includes(status as MatchStatus)) {
+        throw new BadRequestException(
+          `Invalid match status. Valid statuses are: ${Object.values(MatchStatus).join(', ')}`,
+        );
+      }
+      validatedStatus = status as MatchStatus;
+    }
+
+    return this.matchService.searchMatchesByRegex(
+      searchTerm,
+      page,
+      limit,
+      tournamentId,
+      validatedStatus,
     );
   }
 

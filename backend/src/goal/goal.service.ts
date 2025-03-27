@@ -6,7 +6,13 @@ import {
 import { PrismaService } from '@/prisma/prisma.service';
 import { Goal } from '@prisma/client';
 import { CreateGoalDto, UpdateGoalDto } from './dtos/goal.dto';
-
+interface SearchScorersParams {
+  searchTerm: string;
+  matchId?: string;
+  tournamentId?: string;
+  page?: number;
+  limit?: number;
+}
 @Injectable()
 export class GoalService {
   constructor(private readonly prisma: PrismaService) {}
@@ -112,6 +118,62 @@ export class GoalService {
     }
 
     return goal;
+  }
+  async searchScorers({
+    searchTerm,
+    matchId,
+    tournamentId,
+    page = 1,
+    limit = 10,
+  }: SearchScorersParams) {
+    // Construct the where clause dynamically
+    const where: any = {
+      OR: [{ name: { contains: searchTerm, mode: 'insensitive' } }],
+    };
+
+    // If matchId is provided, find players who scored in that match
+    if (matchId) {
+      where.goals = {
+        some: { matchId },
+      };
+    }
+
+    // If tournamentId is provided, find players from teams in that tournament
+    if (tournamentId) {
+      where.team = {
+        tournamentId,
+      };
+    }
+
+    // Perform the search with pagination
+    const totalPlayers = await this.prisma.player.count({ where });
+
+    const players = await this.prisma.player.findMany({
+      where,
+      skip: (page - 1) * limit,
+      take: Number(limit),
+      include: {
+        team: true,
+        goals: matchId
+          ? {
+              where: { matchId },
+              select: { id: true },
+            }
+          : false,
+      },
+      orderBy: {
+        name: 'asc',
+      },
+    });
+
+    return {
+      data: players,
+      meta: {
+        total: totalPlayers,
+        page,
+        limit,
+      },
+    };
   }
 
   async createGoal(data: CreateGoalDto): Promise<Goal> {
@@ -316,5 +378,65 @@ export class GoalService {
         scorer: true,
       },
     });
+  }
+  async getTopScorers(
+    tournamentId?: string,
+    page: number = 1,
+    limit: number = 10,
+  ): Promise<{
+    data: any[];
+    meta: { total: number; page: number; limit: number };
+  }> {
+    // Điều kiện lọc theo giải đấu nếu có
+    const whereCondition: any = {};
+    if (tournamentId) {
+      whereCondition.match = {
+        OR: [{ homeTeam: { tournamentId } }, { awayTeam: { tournamentId } }],
+      };
+    }
+
+    // Đếm tổng số cầu thủ có ít nhất 1 bàn thắng
+    const totalScorers = await this.prisma.goal.groupBy({
+      by: ['scorerId'],
+      _count: { scorerId: true },
+      where: whereCondition,
+    });
+
+    const total = totalScorers.length;
+
+    // Lấy danh sách cầu thủ ghi bàn theo trang
+    const topScorers = await this.prisma.goal.groupBy({
+      by: ['scorerId'],
+      _count: { scorerId: true },
+      where: whereCondition,
+      orderBy: {
+        _count: { scorerId: 'desc' },
+      },
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+
+    // Lấy thông tin cầu thủ và đội bóng trong một truy vấn duy nhất
+    const playerIds = topScorers.map((scorer) => scorer.scorerId);
+    const players = await this.prisma.player.findMany({
+      where: { id: { in: playerIds } },
+      include: { team: true },
+    });
+
+    // Map dữ liệu trả về
+    const result = topScorers.map((scorer) => {
+      const player = players.find((p) => p.id === scorer.scorerId);
+      return {
+        playerId: player?.id,
+        playerName: player?.name,
+        team: player?.team,
+        goals: scorer._count.scorerId,
+      };
+    });
+
+    return {
+      data: result,
+      meta: { total, page, limit },
+    };
   }
 }

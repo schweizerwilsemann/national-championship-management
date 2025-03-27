@@ -1,9 +1,11 @@
 import {
   Body,
   Controller,
+  DefaultValuePipe,
   Delete,
   Get,
   Param,
+  ParseIntPipe,
   Post,
   Put,
   Query,
@@ -45,6 +47,37 @@ export class GoalController {
     return this.goalService.getGoalsByPlayer(playerId);
   }
 
+  @Public()
+  @Get('top-scorers')
+  async getTopScorers(
+    @Query('tournamentId') tournamentId?: string,
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+  ) {
+    return this.goalService.getTopScorers(
+      tournamentId,
+      Number(page),
+      Number(limit),
+    );
+  }
+
+  @Public()
+  @Get('/search-scorers')
+  async searchScorers(
+    @Query('searchTerm') searchTerm: string,
+    @Query('matchId') matchId?: string,
+    @Query('tournamentId') tournamentId?: string,
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number = 1,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number = 10,
+  ) {
+    return this.goalService.searchScorers({
+      searchTerm,
+      matchId,
+      tournamentId,
+      page,
+      limit,
+    });
+  }
   @Public()
   @Get(':id')
   @UsePipes(UUIDValidationPipe)
