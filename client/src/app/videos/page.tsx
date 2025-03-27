@@ -1,13 +1,15 @@
-// app/videos/page.tsx
-
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { getAllVideos } from '@/utilities/apis/socials/videos/videos.api';
 import { Video, GetVideosParams } from '@/types/video';
 import VideoCard from '@/components/video/video.card';
 
 const VideosPage = () => {
+    const searchParams = useSearchParams();
+    const initialSearchTerm = searchParams?.get('search') || '';
+
     const [videos, setVideos] = useState<Video[]>([]);
     const [totalVideos, setTotalVideos] = useState<number>(0);
     const [loading, setLoading] = useState<boolean>(true);
@@ -15,7 +17,8 @@ const VideosPage = () => {
     const [params, setParams] = useState<GetVideosParams>({
         sortBy: 'newest',
         limit: 12,
-        startIndex: 0
+        startIndex: 0,
+        searchTerm: initialSearchTerm // Pre-fill search term if passed
     });
 
     useEffect(() => {
@@ -51,27 +54,6 @@ const VideosPage = () => {
     const loadMore = () => {
         setParams(prev => ({ ...prev, startIndex: (prev.startIndex || 0) + (prev.limit || 12) }));
     };
-
-    if (loading && videos.length === 0) {
-        return (
-            <div className="container mx-auto px-4 py-8">
-                <div className="flex justify-center items-center h-64">
-                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-                </div>
-            </div>
-        );
-    }
-
-    if (error && videos.length === 0) {
-        return (
-            <div className="container mx-auto px-4 py-8">
-                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-                    <strong className="font-bold">Error!</strong>
-                    <span className="block sm:inline"> {error}</span>
-                </div>
-            </div>
-        );
-    }
 
     return (
         <div className="container mx-auto px-4 py-8">
@@ -113,14 +95,15 @@ const VideosPage = () => {
                             id="search"
                             className="focus:ring-blue-500 focus:border-blue-500 block w-full pl-3 pr-10 py-2 sm:text-sm border-gray-300 rounded-md"
                             placeholder="Search videos..."
+                            value={params.searchTerm}
                             onChange={(e) => handleSearch(e.target.value)}
                         />
                     </div>
                 </div>
             </div>
 
-            {/* Videos Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {/* Videos List */}
+            <div className="space-y-4">
                 {videos.map((video) => (
                     <VideoCard key={video._id} video={video} />
                 ))}

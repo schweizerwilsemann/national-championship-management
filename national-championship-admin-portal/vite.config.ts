@@ -21,14 +21,6 @@ export default defineConfig(({ mode }) => {
           cookieDomainRewrite: {
             "*": "",
           },
-          configure: (proxy, _options) => {
-            proxy.on("proxyRes", (proxyRes) => {
-              const cookies = proxyRes.headers["set-cookie"];
-              if (cookies) {
-                console.log("Received cookies from /api/v1 backend:", cookies);
-              }
-            });
-          },
         },
         "/api": {
           target: env.VITE_ADMIN_SOCIAL_BACKEND_URL,
@@ -37,14 +29,7 @@ export default defineConfig(({ mode }) => {
           cookieDomainRewrite: {
             "*": "",
           },
-          configure: (proxy, _options) => {
-            proxy.on("proxyRes", (proxyRes) => {
-              const cookies = proxyRes.headers["set-cookie"];
-              if (cookies) {
-                console.log("Received cookies from /api backend:", cookies);
-              }
-            });
-          },
+
         },
       },
     },
