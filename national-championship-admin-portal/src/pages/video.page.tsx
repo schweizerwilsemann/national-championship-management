@@ -129,9 +129,8 @@ const VideosPage: FC = () => {
     };
     const handleModalClose = () => {
         setModalVisible(false);
-        form.resetFields(); // Reset form ngay khi modal đóng
-        setCurrentVideo(null); // Reset currentVideo luôn
-        console.log(">>> I am done");
+        form.resetFields();
+        setCurrentVideo(null);
     };
 
     // Table columns
