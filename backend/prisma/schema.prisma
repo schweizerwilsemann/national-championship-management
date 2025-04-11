@@ -57,13 +57,23 @@ enum TournamentStatus {
   CANCELLED
 }
 
-// Đội bóng
+// Đội bóng (Club in Premier League)
 model Team {
   id              String    @id @default(uuid())
   name            String
   shortName       String?   @db.VarChar(10)  // Tên viết tắt
   logo            String?
   homeColor       String?   // Màu áo sân nhà
+  // Premier League specific club details
+  founded         Int?      // Year the club was founded
+  stadium         String?   // Stadium name
+  address         String?   // Club address
+  city            String?
+  country         String    @default("England")  // Default to England for Premier League
+  latitude        Float?    // For Google Maps integration
+  longitude       Float?    // For Google Maps integration
+  website         String?
+  description     String?   @db.Text
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
   // Quan hệ
@@ -87,6 +97,10 @@ model Player {
   birthDate       DateTime
   nationality     String
   image           String?
+  height          Int?      // Height in cm
+  weight          Int?      // Weight in kg
+  preferredFoot   Foot?     // Preferred foot
+  biography       String?   @db.Text
   isActive        Boolean   @default(true)
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
@@ -104,6 +118,12 @@ enum PlayerPosition {
   DEFENDER        // Hậu vệ
   MIDFIELDER      // Tiền vệ
   FORWARD         // Tiền đạo
+}
+
+enum Foot {
+  LEFT
+  RIGHT
+  BOTH
 }
 
 // Trận đấu

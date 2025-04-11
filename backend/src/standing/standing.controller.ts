@@ -18,7 +18,7 @@ import { Public } from '@/decorators/public.decorator';
 
 @Controller('standings')
 export class StandingController {
-  constructor(private readonly standingService: StandingService) {}
+  constructor(private readonly standingService: StandingService) { }
 
   @Public()
   @Get()
@@ -65,7 +65,6 @@ export class StandingController {
 
   @Put(':id')
   @Roles('ADMIN', 'ORGANIZER')
-  @UsePipes(UUIDValidationPipe)
   async updateStanding(
     @Param('id') id: string,
     @Body() updateStandingDto: UpdateStandingDto,
@@ -82,7 +81,7 @@ export class StandingController {
 
   @Post('update-after-match/:matchId')
   @Roles('ADMIN', 'ORGANIZER', 'REFEREE')
-  @UsePipes(UUIDValidationPipe)
+
   async updateStandingAfterMatch(
     @Param('matchId') matchId: string,
   ): Promise<void> {

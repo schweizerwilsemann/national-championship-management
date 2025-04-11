@@ -10,6 +10,7 @@ import {
   Put,
   UseGuards,
   UsePipes,
+  Query,
 } from '@nestjs/common';
 import { UUIDValidationPipe } from '@/pipes/uuid-validation.pipe';
 import { CreateTeamDto, UpdateTeamDto } from './dtos/team.dto';
@@ -18,7 +19,7 @@ import { Public } from '@/decorators/public.decorator';
 
 @Controller('teams')
 export class TeamController {
-  constructor(private readonly teamService: TeamService) {}
+  constructor(private readonly teamService: TeamService) { }
 
   @Public()
   @Get()
@@ -36,10 +37,20 @@ export class TeamController {
   }
 
   @Public()
-  @Get(':id')
+  @Get(':id/players')
   @UsePipes(UUIDValidationPipe)
-  async getTeamById(@Param('id') id: string): Promise<Team> {
-    return this.teamService.getTeamById(id);
+  async getTeamPlayers(@Param('id') id: string) {
+    return this.teamService.getTeamPlayers(id);
+  }
+
+  @Public()
+  @Get(':id')
+  async getTeamById(
+    @Param('id') id: string,
+    @Query('include') include?: string,
+  ): Promise<Team> {
+    const includePlayers = include === 'players';
+    return this.teamService.getTeamById(id, includePlayers);
   }
 
   @Post()

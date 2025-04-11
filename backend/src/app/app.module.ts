@@ -41,4 +41,4 @@ import { RolesGuard } from '@/guards/roles.guard';
     },
   ],
 })
-export class AppModule {}
+export class AppModule { }

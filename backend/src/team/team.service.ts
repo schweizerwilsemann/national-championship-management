@@ -5,7 +5,7 @@ import { CreateTeamDto, UpdateTeamDto } from './dtos/team.dto';
 
 @Injectable()
 export class TeamService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   async getAllTeams(): Promise<Team[]> {
     return this.prisma.team.findMany({
@@ -22,10 +22,35 @@ export class TeamService {
     });
   }
 
-  async getTeamById(id: string): Promise<Team> {
+  async getTeamPlayers(teamId: string) {
+    // Check if team exists
+    const team = await this.prisma.team.findUnique({
+      where: { id: teamId },
+    });
+
+    if (!team) {
+      throw new NotFoundException(`Team with ID ${teamId} not found`);
+    }
+
+    // Get all players for this team
+    const players = await this.prisma.player.findMany({
+      where: { teamId },
+      orderBy: [
+        { position: 'asc' },
+        { number: 'asc' }
+      ],
+    });
+
+    return players;
+  }
+
+  async getTeamById(id: string, includePlayers = false): Promise<Team> {
     const team = await this.prisma.team.findUnique({
       where: { id },
-      include: { tournament: true },
+      include: {
+        tournament: true,
+        ...(includePlayers ? { players: true } : {})
+      },
     });
 
     if (!team) {

@@ -8,7 +8,7 @@ import {
 
 @Injectable()
 export class TournamentService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   async getAllTournaments(): Promise<Tournament[]> {
     return this.prisma.tournament.findMany({

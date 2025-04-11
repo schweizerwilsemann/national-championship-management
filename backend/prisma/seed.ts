@@ -675,7 +675,7 @@ main()
   });
 
 /// =====================================================================================>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-// new data
+// others entity data
 
 // import { PrismaClient, MatchStatus, Prisma } from '@prisma/client';
 
@@ -734,7 +734,7 @@ main()
 //       // Random date between start and end dates
 //       const matchDate = new Date(
 //         startDate.getTime() +
-//           Math.random() * (endDate.getTime() - startDate.getTime()),
+//         Math.random() * (endDate.getTime() - startDate.getTime()),
 //       );
 
 //       // Format hours and minutes as HH:MM
@@ -762,7 +762,7 @@ main()
 //       // Random date between start and end dates
 //       const matchDate = new Date(
 //         startDate.getTime() +
-//           Math.random() * (endDate.getTime() - startDate.getTime()),
+//         Math.random() * (endDate.getTime() - startDate.getTime()),
 //       );
 
 //       // Format hours and minutes as HH:MM
@@ -790,7 +790,7 @@ main()
 //       // Random date between start and end dates
 //       const matchDate = new Date(
 //         startDate.getTime() +
-//           Math.random() * (endDate.getTime() - startDate.getTime()),
+//         Math.random() * (endDate.getTime() - startDate.getTime()),
 //       );
 
 //       // Format hours and minutes as HH:MM
