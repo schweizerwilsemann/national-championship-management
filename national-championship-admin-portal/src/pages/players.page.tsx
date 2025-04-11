@@ -1,11 +1,24 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import EntityManager from '@/components/EntityManager';
 import PlayerForm from '@/components/forms/PlayerForm';
 import { Tag } from 'antd';
+import { useSeason } from '@/context/season.context';
 
 const PlayersPage: React.FC = () => {
     const [currentPlayer, setCurrentPlayer] = useState<any>(null);
     const [formMode, setFormMode] = useState<'create' | 'edit'>('create');
+    const { currentSeason } = useSeason();
+    const [endpointKey, setEndpointKey] = useState<string>('players');
+
+    // Fixed: Use the proper API endpoint format that combines tournament filtering with pagination
+    useEffect(() => {
+        if (currentSeason) {
+            // This is the correct endpoint format that supports pagination
+            setEndpointKey('players');
+        } else {
+            setEndpointKey('players');
+        }
+    }, [currentSeason]);
 
     const handleCreateForm = useCallback(() => {
         setCurrentPlayer(null);
@@ -13,12 +26,13 @@ const PlayersPage: React.FC = () => {
         return (
             <PlayerForm
                 mode="create"
+                initialValues={{ teamId: '', teamTournamentId: currentSeason?.id }}
                 onSuccess={() => {
                     // Modal will be closed by the EntityManager component
                 }}
             />
         );
-    }, []);
+    }, [currentSeason]);
 
     const handleEditForm = useCallback((record: any) => {
         setCurrentPlayer(record);
@@ -110,11 +124,13 @@ const PlayersPage: React.FC = () => {
         {
             key: 'players',
             name: 'Player',
-            endpoint: 'players',
+            endpoint: endpointKey,
             columns: playerColumns,
             createForm: handleCreateForm,
             editForm: handleEditForm,
-            usePagination: true, // Enable pagination for players
+            usePagination: true,
+            extraParams: currentSeason ? { tournamentId: currentSeason.id } : undefined,
+            title: currentSeason ? `Players - ${currentSeason.name}` : 'Players',
         },
     ];
 

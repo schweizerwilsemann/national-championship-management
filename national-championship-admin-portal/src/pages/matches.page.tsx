@@ -1,11 +1,20 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import EntityManager from '@/components/EntityManager';
 import MatchForm from '@/components/forms/MatchForm';
 import { Tag } from 'antd';
+import { useSeason } from '@/context/season.context';
 
 const MatchesPage: React.FC = () => {
     const [currentMatch, setCurrentMatch] = useState<any>(null);
     const [formMode, setFormMode] = useState<'create' | 'edit'>('create');
+    const { currentSeason } = useSeason();
+    const [endpointKey, setEndpointKey] = useState<string>('matches');
+
+    // Fixed: Use the proper API endpoint format that combines tournament filtering with pagination
+    useEffect(() => {
+        // Using the base endpoint with params is more reliable for pagination
+        setEndpointKey('matches');
+    }, [currentSeason]);
 
     const handleCreateForm = useCallback(() => {
         setCurrentMatch(null);
@@ -13,12 +22,13 @@ const MatchesPage: React.FC = () => {
         return (
             <MatchForm
                 mode="create"
+                initialValues={{ tournamentId: currentSeason?.id }}
                 onSuccess={() => {
                     // Modal will be closed by the EntityManager component
                 }}
             />
         );
-    }, []);
+    }, [currentSeason]);
 
     const handleEditForm = useCallback((record: any) => {
         setCurrentMatch(record);
@@ -119,11 +129,13 @@ const MatchesPage: React.FC = () => {
         {
             key: 'matches',
             name: 'Match',
-            endpoint: 'matches',
+            endpoint: endpointKey,
             columns: matchColumns,
             createForm: handleCreateForm,
             editForm: handleEditForm,
             usePagination: true,
+            extraParams: currentSeason ? { tournamentId: currentSeason.id } : undefined,
+            title: currentSeason ? `Matches - ${currentSeason.name}` : 'Matches',
         },
     ];
 

@@ -11,6 +11,8 @@
   },
   "dependencies": {
     "@ant-design/v5-patch-for-react-19": "^1.0.3",
+    "@headlessui/react": "^2.2.1",
+    "@heroicons/react": "^2.2.0",
     "@tiptap/react": "^2.11.5",
     "@tiptap/starter-kit": "^2.11.5",
     "@types/js-cookie": "^3.0.6",

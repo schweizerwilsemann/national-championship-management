@@ -1,10 +1,19 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import EntityManager from '@/components/EntityManager';
 import StandingForm from '@/components/forms/StandingForm';
+import { useSeason } from '@/context/season.context';
 
 const StandingsPage: React.FC = () => {
     const [currentStanding, setCurrentStanding] = useState<any>(null);
     const [formMode, setFormMode] = useState<'create' | 'edit'>('create');
+    const { currentSeason } = useSeason();
+    const [endpointKey, setEndpointKey] = useState<string>('standings');
+
+    // Fixed: Use the proper API endpoint format with query parameters
+    useEffect(() => {
+        // Use the base endpoint and provide tournament ID as a parameter
+        setEndpointKey('standings');
+    }, [currentSeason]);
 
     const handleCreateForm = useCallback(() => {
         setCurrentStanding(null);
@@ -12,12 +21,13 @@ const StandingsPage: React.FC = () => {
         return (
             <StandingForm
                 mode="create"
+                initialValues={{ tournamentId: currentSeason?.id }}
                 onSuccess={() => {
                     // Modal will be closed by the EntityManager component
                 }}
             />
         );
-    }, []);
+    }, [currentSeason]);
 
     const handleEditForm = useCallback((record: any) => {
         setCurrentStanding(record);
@@ -119,10 +129,13 @@ const StandingsPage: React.FC = () => {
         {
             key: 'standings',
             name: 'Standing',
-            endpoint: 'standings',
+            endpoint: endpointKey,
             columns: standingColumns,
             createForm: handleCreateForm,
             editForm: handleEditForm,
+            usePagination: true,
+            extraParams: currentSeason ? { tournamentId: currentSeason.id } : undefined,
+            title: currentSeason ? `Standings - ${currentSeason.name}` : 'Standings',
         },
     ];
 

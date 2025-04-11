@@ -65,6 +65,8 @@ const UsersPage: React.FC = () => {
             columns: userColumns,
             createForm: handleCreateForm,
             editForm: handleEditForm,
+            usePagination: true,
+            title: 'User Management',
         },
     ];
 

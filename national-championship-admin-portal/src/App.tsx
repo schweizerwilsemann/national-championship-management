@@ -3,11 +3,12 @@ import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-
 import '@/App.css';
 import LoginPage from '@/pages/login.page';
 import DashboardPage from '@/pages/dashboard.page';
-import UsersPage from '@/pages/UsersPage';
 import { useAuth } from '@/context/auth.context';
 import { Spin } from 'antd';
 import React from 'react';
 import CreatePost from './pages/createpost.page';
+import { SeasonProvider } from './context/season.context';
+import { OngoingTourProvider } from './context/ongoing.tournament.context';
 
 // Protected route component
 const ProtectedRoute = ({ children }: { children: React.ReactElement }) => {
@@ -69,13 +70,21 @@ const App = () => {
       } />
       <Route path="/dashboard/*" element={
         <ProtectedRoute>
-          <DashboardPage />
+          <OngoingTourProvider>
+            <SeasonProvider>
+              <DashboardPage />
+            </SeasonProvider>
+          </OngoingTourProvider>
         </ProtectedRoute>
       } />
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
       <Route path="/create-post" element={
         <ProtectedRoute>
-          <CreatePost />
+          <OngoingTourProvider>
+            <SeasonProvider>
+              <CreatePost />
+            </SeasonProvider>
+          </OngoingTourProvider>
         </ProtectedRoute>
       } />
     </Routes>

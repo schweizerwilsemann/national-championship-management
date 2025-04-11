@@ -1,11 +1,21 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import EntityManager from '@/components/EntityManager';
 import GoalForm from '@/components/forms/GoalForm';
 import { Tag } from 'antd';
+import { useSeason } from '@/context/season.context';
 
 const GoalsPage: React.FC = () => {
     const [currentGoal, setCurrentGoal] = useState<any>(null);
     const [formMode, setFormMode] = useState<'create' | 'edit'>('create');
+    const { currentSeason } = useSeason();
+    const [endpointKey, setEndpointKey] = useState<string>('goals');
+
+    // Fixed: Use the proper API endpoint format that combines tournament filtering with pagination
+    useEffect(() => {
+        // Using the base 'goals' endpoint and providing tournament ID as a parameter
+        // is the correct approach to support pagination properly
+        setEndpointKey('goals');
+    }, [currentSeason]);
 
     const handleCreateForm = useCallback(() => {
         setCurrentGoal(null);
@@ -13,12 +23,13 @@ const GoalsPage: React.FC = () => {
         return (
             <GoalForm
                 mode="create"
+                initialValues={{ tournamentId: currentSeason?.id }}
                 onSuccess={() => {
                     // Modal will be closed by the EntityManager component
                 }}
             />
         );
-    }, []);
+    }, [currentSeason]);
 
     const handleEditForm = useCallback((record: any) => {
         console.log("Edit form data:", record);
@@ -128,11 +139,13 @@ const GoalsPage: React.FC = () => {
         {
             key: 'goals',
             name: 'Goal',
-            endpoint: 'goals',
+            endpoint: endpointKey,
             columns: goalColumns,
             createForm: handleCreateForm,
             editForm: handleEditForm,
             usePagination: true,
+            extraParams: currentSeason ? { tournamentId: currentSeason.id } : undefined,
+            title: currentSeason ? `Goals - ${currentSeason.name}` : 'Goals',
         },
     ];
 
